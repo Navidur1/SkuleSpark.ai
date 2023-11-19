@@ -1,7 +1,8 @@
 import requests
 import json
 from database import insert_one
-from flask import Blueprint
+from flask import Blueprint, request, json
+from io import BytesIO
 
 ocr_service = Blueprint('ocr_service', __name__)
 
@@ -56,10 +57,10 @@ def chunk_elements(elements):
     return chunk_success
 
 
-@ocr_service.route('/ocr_service')
+@ocr_service.route('/ocr_service', methods=["POST"])
 def ocr_flow():
     url = "https://api.unstructured.io/general/v0/general"
-    
+
     headers = {
         "accept": "application/json",
         "unstructured-api-key": "ryHik0FZBTS4YoZi8N9ca6nOyP3zur",
@@ -70,8 +71,15 @@ def ocr_flow():
         "coordinates": "true"
     }
 
-    file_path = "resume.pdf"
-    file_data = {'files': open(file_path, 'rb')}
+    # Get file id
+    data = request.json
+    file_id = data['file_id']
+
+    # Open file and send to unstructured
+    uploaded_file = request.files['file']
+    file_object = BytesIO(uploaded_file.read())
+    file_object.seek(0)
+    file_data = {'files': file_object}
 
     response = requests.post(url, headers=headers, files=file_data, data=data)
 
@@ -80,7 +88,6 @@ def ocr_flow():
     json_response = response.json()
 
     success = chunk_elements(json_response)
-    file_id = 0
     
     if success:
         return 200, file_id
