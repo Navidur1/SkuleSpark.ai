@@ -1,11 +1,19 @@
 import requests
 import json
-from database import insert_one
-from flask import Blueprint, request, json
+from database import insert_one, get_data_one
+from flask import Blueprint, request, json, jsonify
 from io import BytesIO
+from google.cloud import storage
+from flask_cors import CORS
+
 
 ocr_service = Blueprint('ocr_service', __name__)
 
+credentials_path = 'credentials.json'
+bucket_name = 'capstone-notes-bucket'
+
+# Initialize Google Cloud Storage client with the service account credentials
+storage_client = storage.Client.from_service_account_json(credentials_path)
 
 def chunk_elements(elements):
     chunks = []
@@ -56,9 +64,7 @@ def chunk_elements(elements):
         
     return chunk_success
 
-
-@ocr_service.route('/ocr_service', methods=["POST"])
-def ocr_flow():
+def ocr_flow(uploaded_file, file_id):
     url = "https://api.unstructured.io/general/v0/general"
 
     headers = {
@@ -71,27 +77,58 @@ def ocr_flow():
         "coordinates": "true"
     }
 
-    # Get file id
-    data = request.json
-    file_id = data['file_id']
-
-    # Open file and send to unstructured
-    uploaded_file = request.files['file']
-    file_object = BytesIO(uploaded_file.read())
-    file_object.seek(0)
-    file_data = {'files': file_object}
+    file_content = uploaded_file.read()
+    file_in_mem = BytesIO(file_content)
+    file_data = {'files': (uploaded_file.filename, file_in_mem)}
 
     response = requests.post(url, headers=headers, files=file_data, data=data)
 
-    file_data['files'].close()
-
+    file_in_mem.close()
     json_response = response.json()
-
-    success = chunk_elements(json_response)
     
-    if success:
-        return 200, file_id
-
-    return 400    
+    return chunk_elements(json_response)  
         
 
+@ocr_service.route('/upload', methods=['POST'])
+def upload_pdf():
+    
+    if 'pdf' not in request.files:
+        return 'No PDF file provided', 400
+
+    pdf_file = request.files['pdf']
+    
+    if pdf_file.filename == '':
+        return 'No selected file', 400
+    
+    # Get the bucket where you want to upload the file
+    bucket = storage_client.bucket(bucket_name)
+
+    # Upload the PDF file to Google Cloud Storage
+    blob = bucket.blob(pdf_file.filename)
+    blob.upload_from_file(pdf_file)
+    pdf_file.stream.seek(0)
+    # Get the GCS URL of the uploaded PDF file
+    gcs_pdf_url = f"https://storage.googleapis.com/{bucket_name}/{pdf_file.filename}"
+
+    print('returning')
+    print(gcs_pdf_url)
+
+    # Upload file metadata to mongo
+    data = {
+        'gcs_link': "fake",
+        'file_name': pdf_file.filename,
+        'chat_ready': False
+    }
+    success, file_id = insert_one('Files', data)
+
+    # Call OCR service
+    if not success:
+        return "error", 404
+
+    success = ocr_flow(pdf_file, file_id)
+    
+    # Return the GCS URL of the uploaded PDF file
+    if success:
+        return jsonify({'gcs_pdf_url': gcs_pdf_url}), 200
+    
+    return jsonify({'gcs_pdf_url': "fake"}), 400
