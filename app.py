@@ -1,14 +1,16 @@
-from flask import Flask, render_template, session, redirect, url_for, flash, request, g
+from flask import Flask, render_template, session, redirect, url_for, flash, request, g, jsonify
 from flask_bootstrap import Bootstrap
 from database import get_data_one
 from bson.objectid import ObjectId
 from database import get_data_one
 from bson.objectid import ObjectId
 from google.cloud import storage
+from flask_cors import CORS
 
 app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
+CORS(app)
 
 credentials_path = 'credentials.json'
 bucket_name = 'capstone-notes-bucket'
@@ -38,11 +40,13 @@ def upload_pdf():
     blob = bucket.blob(pdf_file.filename)
     blob.upload_from_file(pdf_file)
 
-    # Get the public URL of the uploaded PDF file
-    pdf_url = blob.public_url
+    # Get the GCS URL of the uploaded PDF file
+    gcs_pdf_url = f"https://storage.googleapis.com/{bucket_name}/{pdf_file.filename}"
 
-    # Return the URL of the uploaded PDF file
-    return {'pdf_url': pdf_url}, 200
+    print('returning')
+    print(gcs_pdf_url)
+    # Return the GCS URL of the uploaded PDF file
+    return jsonify({'gcs_pdf_url': gcs_pdf_url}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
