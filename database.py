@@ -2,7 +2,6 @@ from pymongo.mongo_client import MongoClient
 from pymongo.errors import *
 import pinecone
 import certifi
-import pinecone
 
 
 
