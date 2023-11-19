@@ -1,5 +1,5 @@
 pycache/
 __pycache__/
 venv/
-credentials.json/
+credentials.json
 .env
