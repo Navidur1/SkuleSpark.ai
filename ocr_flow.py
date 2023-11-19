@@ -1,6 +1,6 @@
 import requests
 import json
-from database import insert_one, get_data_one
+from database import insert_one, get_data_one, update_one
 from flask import Blueprint, request, json, jsonify
 from io import BytesIO
 from google.cloud import storage
@@ -15,7 +15,7 @@ bucket_name = 'capstone-notes-bucket'
 # Initialize Google Cloud Storage client with the service account credentials
 storage_client = storage.Client.from_service_account_json(credentials_path)
 
-def chunk_elements(elements):
+def chunk_elements(elements, file_id):
     chunks = []
     threshold = 512
     stored_ids = []
@@ -25,6 +25,7 @@ def chunk_elements(elements):
     final_text = []
     cur_text = ""
     chunk_success = True
+
     while i < len(elements):
         # add to mongodb for element
         # recieve element_id
@@ -51,7 +52,8 @@ def chunk_elements(elements):
     
     if chunk_success:
         for chunk in chunks:
-            chunk_success, element_id = insert_one('Chunks', chunk)
+            chunk_success, chunk_id = insert_one('Chunks', chunk)
+            update_one('Files', {'_id': file_id}, {'$push': {'chunk_ids': chunk_id}})
 
         if len(cur_element_ids) > 0:
             final_text.append(cur_text)
@@ -62,7 +64,7 @@ def chunk_elements(elements):
             print(len(text))
             print("\n")
         
-    return chunk_success
+    return chunk_success, chunks
 
 def ocr_flow(uploaded_file, file_id):
     url = "https://api.unstructured.io/general/v0/general"
@@ -86,7 +88,7 @@ def ocr_flow(uploaded_file, file_id):
     file_in_mem.close()
     json_response = response.json()
     
-    return chunk_elements(json_response)  
+    return chunk_elements(json_response, file_id)
         
 
 @ocr_service.route('/upload', methods=['POST'])
@@ -115,7 +117,7 @@ def upload_pdf():
 
     # Upload file metadata to mongo
     data = {
-        'gcs_link': "fake",
+        'gcs_link': gcs_pdf_url,
         'file_name': pdf_file.filename,
         'chat_ready': False
     }
