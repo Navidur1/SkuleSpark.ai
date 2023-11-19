@@ -5,11 +5,13 @@ from database import get_data_one
 from bson.objectid import ObjectId
 from google.cloud import storage
 from flask_cors import CORS
+from chat import chat_service
 from ocr_flow import ocr_service
 from embedding_service import embedding_service
 from chat import chat_service
 
 app = Flask(__name__)
+app.register_blueprint(chat_service)
 app.register_blueprint(ocr_service)
 app.register_blueprint(embedding_service)
 
