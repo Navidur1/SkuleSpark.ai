@@ -4,17 +4,6 @@ import pinecone
 import certifi
 
 
-
-# Connect with pinecone
-try:
-    pinecone.init(api_key="dfcae6b3-b49d-4a28-916c-59ed61c7172a", environment='northamerica-northeast1-gcp')  # Replace with your Pinecone API key
-    index_name = "skulespark"
-    pindex = pinecone.Index(index_name)
-    print(pinecone.list_indexes(), pindex.describe_index_stats())
-    print("Connected to Pinecone")
-except ConfigurationError:
-    print("Could not connect to pinecone")
-
 # Connect to MongoDB
 uri = "mongodb+srv://admin_user:Vah4GspZSs5Qnk52@skulespark.haymwow.mongodb.net/?retryWrites=true&w=majority"
 try:
@@ -26,8 +15,6 @@ try:
 except ConfigurationError:
     print("An Invalid URI host error was received. Is your Atlas host name correct in your connection string?")
 
-# Database wrapper functions for all database related tasks
-# Add in other wrappers as we need them
 
 # Connect with pinecone
 try:
@@ -36,8 +23,12 @@ try:
     pindex = pinecone.Index(index_name)
     print(pinecone.list_indexes(), pindex.describe_index_stats())
     print("Connected to Pinecone")
+
 except ConfigurationError:
     print("Could not connect to pinecone")
+
+# Database wrapper functions for all database related tasks
+# Add in other wrappers as we need them
 
 # Get multiple documents
 def get_data(collection_name, filter=None, projection=None, sort=None):
@@ -114,16 +105,17 @@ def pc_get_many(message_embedding, file_id, top_k=5):
     filter = {"file_id": file_id}
     try:
         query_result = pindex.query([message_embedding], top_k=top_k, include_metadata=True, filter=filter)
-        return query_result
+        return (True, query_result)
+
     except Exception as e:
         print("An error occured during Pinecone query:", str(e))
-        return None
+        return (False, e)
     
 def pc_insert_one(data):
     try:
         pindex.upsert(data)
         return True
+
     except Exception as e:
-        print("Error inserting to pinecone")
-        print(e)
-        return None
+        print("Error inserting to pinecone:", str(e))
+        return False

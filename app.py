@@ -13,7 +13,6 @@ app.register_blueprint(chat_service)
 app.register_blueprint(ocr_service)
 app.register_blueprint(embedding_service)
 
-app.register_blueprint(chat_service)
 CORS(app)
 
 

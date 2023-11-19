@@ -30,9 +30,9 @@ def num_tokens_from_string(string: str):
 
 def get_relevant_sources(message, file_id):
     message_embedding = client.embeddings.create(input=message, model=embedding_model).data[0].embedding
-    query_results = pc_get_many(message_embedding,file_id)
+    success, query_results = pc_get_many(message_embedding,file_id)
     print(query_results)
-    if query_results is None:
+    if not success:
         return ""
 
     MAX_TOKENS = 1100

@@ -37,7 +37,9 @@ def create_embeddings():
 
         embedding_res = openai.embeddings.create(input=text_to_embed, model=embedding_model)
         pinecone_entry = (str(chunk_id), embedding_res.data[0].embedding, {"file_id": file_id})
-        pc_insert_one([pinecone_entry])
+        success = pc_insert_one([pinecone_entry])
+        if not success:
+            return "Error"
         
     return jsonify("fake"), 200
 
