@@ -6,10 +6,12 @@ from database import get_data_one
 from bson.objectid import ObjectId
 from google.cloud import storage
 from flask_cors import CORS
+from chat import chat_service
 
 app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
+app.register_blueprint(chat_service)
 CORS(app)
 
 credentials_path = 'credentials.json'
