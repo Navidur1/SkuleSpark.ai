@@ -6,7 +6,7 @@ import certifi
 uri = "mongodb+srv://admin_user:Vah4GspZSs5Qnk52@skulespark.haymwow.mongodb.net/?retryWrites=true&w=majority"
 try:
     client = MongoClient(uri, tlsCAFile=certifi.where())
-    db_client = client['CampusConnect']
+    db_client = client['SkuleSpark']
     print("Connected to database")
   
 # return a friendly error if a URI error is thrown 
