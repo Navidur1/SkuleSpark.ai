@@ -1,7 +1,19 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.errors import *
+import pinecone
 import certifi
 import pinecone
+
+
+# Connect with pinecone
+try:
+    pinecone.init(api_key="dfcae6b3-b49d-4a28-916c-59ed61c7172a", environment='northamerica-northeast1-gcp')  # Replace with your Pinecone API key
+    index_name = "skulespark"
+    pindex = pinecone.Index(index_name)
+    print(pinecone.list_indexes(), pindex.describe_index_stats())
+    print("Connected to Pinecone")
+except ConfigurationError:
+    print("Could not connect to pinecone")
 
 # Connect to MongoDB
 uri = "mongodb+srv://admin_user:Vah4GspZSs5Qnk52@skulespark.haymwow.mongodb.net/?retryWrites=true&w=majority"

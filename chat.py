@@ -1,17 +1,20 @@
 from flask import Blueprint, request, json, jsonify
 import requests
-import openai
+from bson.objectid import ObjectId
+from openai import OpenAI
 import json
 import os
 import tiktoken
 from dotenv import load_dotenv,find_dotenv
+from database import pc_get_many, get_data_one
 
 
 # Set up open ai 
 dotenv_path = find_dotenv(raise_error_if_not_found=True)
 load_dotenv(dotenv_path)
-openai_key = os.getenv("OPENAI_KEY")
-openai.api_key = openai_key
+client = OpenAI(
+  api_key=os.environ['OPENAI_API_KEY'],  # this is also the default, it can be omitted
+)
 
 model_id = 'gpt-3.5-turbo'
 embedding_model = "text-embedding-ada-002"
@@ -26,9 +29,9 @@ def num_tokens_from_string(string: str):
 
 
 def get_relevant_sources(message, file_id):
-    message_embedding = openai.Embedding.create(input=message, model=embedding_model)['data'][0]['embedding']
+    message_embedding = client.embeddings.create(input=message, model=embedding_model).data[0].embedding
     query_results = pc_get_many(message_embedding,file_id)
-
+    print(query_results)
     if query_results is None:
         return ""
 
@@ -37,7 +40,12 @@ def get_relevant_sources(message, file_id):
     context = []
 
     for match in query_results['matches']:
-        text = match['metadata']['text']
+        success, chunk= get_data_one('Chunks', { '_id': ObjectId(match['id'])})
+        print(chunk)
+        text = ""
+        for elem_id in chunk['element_ids']:
+            text += get_data_one('Elements', { '_id': elem_id})[1]['text']
+        
         #print(match['score'], text)
         if (match['score'] < 0.77):
             #continue
@@ -54,7 +62,7 @@ def get_relevant_sources(message, file_id):
 def get_augmented_message(message, sources):
     
     source_introduction = f"Context from student's notes:\n\n" #"Use the following information, retrieved from relevant financial documents, to help answer the subsequent question.\n\n"
-    augmented_message = introduction + source_introduction
+    augmented_message = source_introduction
     source_text = ""
     for i,source in enumerate(sources):
         source_text += f"{i}. {source} \n\n"
@@ -76,7 +84,7 @@ def get_gpt_response(augmented_message):
                     "content": augmented_message
                 }]
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model = model_id,
         messages = messages,
         stream=False
@@ -95,6 +103,6 @@ def handle_chat_prompt():
 
     response_data ={
         'answer' : chatgpt_response,
-        'sources': []
+        'sources': sources
     }
     return jsonify(response_data)
