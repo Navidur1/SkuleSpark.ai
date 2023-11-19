@@ -1,6 +1,7 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.errors import *
 import certifi
+import pinecone
 
 # Connect to MongoDB
 uri = "mongodb+srv://admin_user:Vah4GspZSs5Qnk52@skulespark.haymwow.mongodb.net/?retryWrites=true&w=majority"
@@ -15,6 +16,16 @@ except ConfigurationError:
 
 # Database wrapper functions for all database related tasks
 # Add in other wrappers as we need them
+
+# Connect with pinecone
+try:
+    pinecone.init(api_key="dfcae6b3-b49d-4a28-916c-59ed61c7172a", environment='northamerica-northeast1-gcp')  # Replace with your Pinecone API key
+    index_name = "skulespark"
+    pindex = pinecone.Index(index_name)
+    print(pinecone.list_indexes(), pindex.describe_index_stats())
+    print("Connected to Pinecone")
+except ConfigurationError:
+    print("Could not connect to pinecone")
 
 # Get multiple documents
 def get_data(collection_name, filter=None, projection=None, sort=None):
@@ -84,3 +95,23 @@ def insert_one(collection_name, data):
     except PyMongoError as e:
         print(f"Database error: {str(e)}")
         return (False, e)
+
+
+def pc_get_many(message_embedding, file_id, top_k=5):
+    
+    filter = {"file_id": file_id}
+    try:
+        query_result = pindex.query([message_embedding], top_k=top_k, include_metadata=True, filter=filter)
+        return query_result
+    except Exception as e:
+        print("An error occured during Pinecone query:", str(e))
+        return None
+    
+def pc_insert_one(data):
+    try:
+        pindex.upsert(data)
+        return True
+    except Exception as e:
+        print("Error inserting to pinecone")
+        print(e)
+        return None
