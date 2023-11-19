@@ -6,7 +6,7 @@ from bson.objectid import ObjectId
 
 embedding_service = Blueprint('embedding_service', __name__)
 
-openai.api_key = "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"
+openai.api_key = ""
 embedding_model = "text-embedding-ada-002"
 
 
