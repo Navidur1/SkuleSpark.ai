@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 const PDFViewer = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfURL, setPdfURL] = useState('');
+  const [ocrResult, setOCRResult] = useState([]);
+  const [fileId, setFileId] = useState(null);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -20,7 +22,8 @@ const PDFViewer = () => {
       });
 
       const data = await response.json();
-      setPdfURL(data.gcs_pdf_url); // Assuming the backend returns the GCS URL
+      setPdfURL(data.gcs_pdf_url);
+      setOCRResult(data.ocr_result);
     } catch (error) {
       console.error('Error uploading PDF:', error);
     }
@@ -39,11 +42,32 @@ const PDFViewer = () => {
     );
   };
 
+  const displayOCRResult = () => {
+    if (ocrResult.length == 0) {
+      return <div></div>;
+    }
+
+    return (
+      <div>
+        <h2>OCR Results:</h2>
+        {ocrResult.map((result, index) => (
+          <div key={index}
+          contentEditable="true"
+          >
+            {/* Assuming each element in the ocrResult array is a string */}
+            <p>{result['text']}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div>
       <input type="file" onChange={handleFileChange} accept=".pdf" />
       <button onClick={handleUpload}>Upload PDF</button>
       {displayPDF()}
+      {displayOCRResult()}
     </div>
   );
 };
