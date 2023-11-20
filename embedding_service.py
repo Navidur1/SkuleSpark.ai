@@ -3,10 +3,13 @@ import openai
 from database import insert_one, get_data_one, update_one, pc_get_many, pc_insert_one
 from flask import Blueprint, request, json, jsonify
 from bson.objectid import ObjectId
+from dotenv import find_dotenv, load_dotenv
+import os
 
 embedding_service = Blueprint('embedding_service', __name__)
-
-openai.api_key = ""
+dotenv_path = find_dotenv(raise_error_if_not_found=True)
+load_dotenv(dotenv_path)
+openai.api_key = os.environ['OPENAI_API_KEY']
 embedding_model = "text-embedding-ada-002"
 
 

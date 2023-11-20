@@ -87,6 +87,7 @@ def ocr_flow(uploaded_file, file_id):
 
     file_in_mem.close()
     json_response = response.json()
+    print(json_response)
     
     return chunk_elements(json_response, file_id)
         
@@ -131,6 +132,6 @@ def upload_pdf():
     
     # Return the GCS URL of the uploaded PDF file
     if success:
-        return jsonify({'gcs_pdf_url': gcs_pdf_url}), 200
+        return jsonify({'gcs_pdf_url': gcs_pdf_url, 'file_id': str(file_id), 'ocr_result': [{'id': 24, 'text': "haha"}, {'id': 25, 'text': "haha2"}, {'id': 27, 'text': "haha3"}]}), 200
     
     return jsonify({'gcs_pdf_url': "fake"}), 400

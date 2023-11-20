@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
+import MarkdownRenderer from '../pages/MarkdownRenderer';
 
 const PDFViewer = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfURL, setPdfURL] = useState('');
-
+  const [ocrResult, setOCRResult] = useState([]);
+  const [fileId, setFileId] = useState(null);
+  const [chatReady, setChatReady] = useState(false);
+  const [userInput, setUserInput] = useState('')
+  const [chatOutput, setChatOutput] = useState('')
+  const [sources, setSources] = useState([])
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setPdfFile(selectedFile);
@@ -20,7 +26,9 @@ const PDFViewer = () => {
       });
 
       const data = await response.json();
-      setPdfURL(data.gcs_pdf_url); // Assuming the backend returns the GCS URL
+      setPdfURL(data.gcs_pdf_url);
+      setOCRResult(data.ocr_result);
+      setFileId(data.file_id);
     } catch (error) {
       console.error('Error uploading PDF:', error);
     }
@@ -39,11 +47,132 @@ const PDFViewer = () => {
     );
   };
 
+  const handleOCRConfirm = async () => {
+    // Add your logic here to handle the click event
+    //console.log('Button clicked!');
+    //send to embed
+    try{
+  
+      const response = await fetch('http://127.0.0.1:5000/create_embeddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Set the content type to JSON
+        },
+        body: JSON.stringify({ file_id: fileId }), // Stringify the body if it's JSON data
+      });
+      if (response.ok) {
+        // Request was successful
+        const data = await response.json();
+        // Update your state variable based on the response data or set it to true
+        setChatReady(true);
+      
+      }
+    }
+    catch (error) {
+      console.error('Error during OCR:', error);
+    }
+    //if ok
+
+
+    // For example, if you want to perform an action when the button is clicked, you can add your code here.
+    // For now, let's just display an alert as an example.
+    //alert('Button clicked!');
+  };
+  const displayOCRResult = () => {
+    if (ocrResult.length == 0) {
+      return <div></div>;
+    }
+
+    return (
+      <div>
+        <h2>OCR Results:</h2>
+        {ocrResult.map((result, index) => (
+          <div key={index}
+          contentEditable="true"
+          >
+            {/* Assuming each element in the ocrResult array is a string */}
+            <p>{result['text']}</p>
+          </div>
+        ))}
+         <button onClick={handleOCRConfirm}>Confirm OCR Results</button>
+      </div>
+    );
+  };
+
+
+  const updateChat = async () => {
+    // TODO: Add logic to generate new chat output based on the user input
+    // For now, let's echo the user input
+    try{
+  
+      const response = await fetch('http://127.0.0.1:5000/chat-prompt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Set the content type to JSON
+        },
+        body: JSON.stringify({ file_id: fileId, message: userInput }), // Stringify the body if it's JSON data
+      });
+      if (response.ok) {
+        // Request was successful
+        const data = await response.json();
+        // Update your state variable based on the response data or set it to true
+        setChatOutput(`SkuleSpark: ${data.answer}`);
+        setSources(data.sources)
+        setUserInput('');
+      
+      }
+    }
+    catch (error) {
+      console.error('Error during chat:', error);
+    }
+    
+  };
+
+  const displayChat = () => {
+    if (!chatReady) {
+      return <div></div>;
+    }
+
+    return (
+      <div>
+        <h2>Chat with your recently updated Note:</h2>
+        <div style={{ display: 'flex' }}>
+          {/* Chat Input */}
+          <div style={{ flex: 1 }}>
+            <h2>Question</h2>
+            <input
+              type="text"
+              placeholder="Type your question..."
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+            />
+            <button onClick={updateChat}>Ask</button>
+          </div>
+
+          {/* Chat Output */}
+          <div style={{ flex: 1, textAlign: 'left' }}>
+            <h2>Answer</h2>
+            <MarkdownRenderer content={chatOutput} />
+            <h3>Sources: </h3>
+            {sources.map((source, index) => (
+              <div key={index}>
+                {/* Assuming each element in the ocrResult array is a string */}
+                <p>{source}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       <input type="file" onChange={handleFileChange} accept=".pdf" />
       <button onClick={handleUpload}>Upload PDF</button>
       {displayPDF()}
+      {displayOCRResult()}
+      {displayChat()}
     </div>
   );
 };

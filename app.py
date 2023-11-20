@@ -18,7 +18,7 @@ CORS(app)
 
 @app.route('/')
 def index():
-    return render_template("homepage.html")
+    return ""
 
 
 if __name__ == '__main__':
