@@ -22,7 +22,6 @@ def chunk_elements(elements, file_id):
     i = 0
     cur_element_ids = []
     cur_text_len = 0
-    final_text = []
     cur_text = ""
     chunk_success = True
 
@@ -39,8 +38,7 @@ def chunk_elements(elements, file_id):
 
 
         if cur_text_len + len(elements[i]['text']) >= threshold:
-            chunks.append({'element_ids': cur_element_ids})
-            final_text.append(cur_text)
+            chunks.append({'element_ids': cur_element_ids, 'text': cur_text})
             cur_element_ids = []
             cur_text_len = 0
             cur_text = ""
@@ -51,20 +49,14 @@ def chunk_elements(elements, file_id):
         i += 1
     
     if chunk_success:
+        if len(cur_element_ids) > 0:
+            chunks.append({'element_ids': cur_element_ids, 'text': cur_text})
+
         for chunk in chunks:
             chunk_success, chunk_id = insert_one('Chunks', chunk)
             update_one('Files', {'_id': file_id}, {'$push': {'chunk_ids': chunk_id}})
 
-        if len(cur_element_ids) > 0:
-            final_text.append(cur_text)
-            chunks.append(cur_element_ids)
-        
-        for text in final_text:
-            print(text)
-            print(len(text))
-            print("\n")
-        
-    return chunk_success, chunks
+    return chunk_success
 
 def ocr_flow(uploaded_file, file_id):
     url = "https://api.unstructured.io/general/v0/general"
@@ -89,8 +81,18 @@ def ocr_flow(uploaded_file, file_id):
     json_response = response.json()
     print(json_response)
     
-    return chunk_elements(json_response, file_id)
-        
+    success = chunk_elements(json_response, file_id)
+
+    elements = []
+
+    for data in json_response:
+        obj = {
+            'id': data['element_id'],
+            'text': data['text']
+        }
+        elements.append(obj)
+
+    return success, elements
 
 @ocr_service.route('/upload', methods=['POST'])
 def upload_pdf():
@@ -128,10 +130,10 @@ def upload_pdf():
     if not success:
         return "error", 404
 
-    success = ocr_flow(pdf_file, file_id)
+    success, ocr_results = ocr_flow(pdf_file, file_id)
     
     # Return the GCS URL of the uploaded PDF file
     if success:
-        return jsonify({'gcs_pdf_url': gcs_pdf_url, 'file_id': str(file_id), 'ocr_result': [{'id': 24, 'text': "haha"}, {'id': 25, 'text': "haha2"}, {'id': 27, 'text': "haha3"}]}), 200
+        return jsonify({'gcs_pdf_url': gcs_pdf_url, 'file_id': str(file_id), 'ocr_result': ocr_results}), 200
     
     return jsonify({'gcs_pdf_url': "fake"}), 400

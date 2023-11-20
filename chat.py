@@ -42,10 +42,8 @@ def get_relevant_sources(message, file_id):
     for match in query_results['matches']:
         success, chunk= get_data_one('Chunks', { '_id': ObjectId(match['id'])})
         print(chunk)
-        text = ""
-        for elem_id in chunk['element_ids']:
-            text += get_data_one('Elements', { '_id': elem_id})[1]['text']
-        
+        text = chunk['text']
+
         #print(match['score'], text)
         if (match['score'] < 0.77):
             #continue

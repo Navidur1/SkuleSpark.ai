@@ -3,13 +3,18 @@ import openai
 from database import insert_one, get_data_one, update_one, pc_get_many, pc_insert_one
 from flask import Blueprint, request, json, jsonify
 from bson.objectid import ObjectId
-from dotenv import find_dotenv, load_dotenv
 import os
+from dotenv import load_dotenv,find_dotenv
 
 embedding_service = Blueprint('embedding_service', __name__)
+
+# Set up open ai 
 dotenv_path = find_dotenv(raise_error_if_not_found=True)
 load_dotenv(dotenv_path)
-openai.api_key = os.environ['OPENAI_API_KEY']
+client = openai.OpenAI(
+  api_key=os.environ['OPENAI_API_KEY'],  # this is also the default, it can be omitted
+)
+
 embedding_model = "text-embedding-ada-002"
 
 
@@ -32,18 +37,15 @@ def create_embeddings():
 
     for chunk_id in chunks:
         text_to_embed = ""
-        success, data = get_data_one('Chunks', {'_id': chunk_id}, {'element_ids': 1})
+        success, data = get_data_one('Chunks', {'_id': chunk_id}, {'element_ids': 1, 'text': 1})
 
-        for element_id in data['element_ids']:
-            success, data = get_data_one('Elements', {'_id': ObjectId(element_id)}, {'text': 1})
-            text_to_embed += data['text']
-
-        embedding_res = openai.embeddings.create(input=text_to_embed, model=embedding_model)
+        text_to_embed = data['text']
+        embedding_res = client.embeddings.create(input=text_to_embed, model=embedding_model)
         pinecone_entry = (str(chunk_id), embedding_res.data[0].embedding, {"file_id": file_id})
         success = pc_insert_one([pinecone_entry])
         if not success:
             return "Error"
         
-    return jsonify("fake"), 200
+    return jsonify("Embed success"), 200
 
 
