@@ -40,7 +40,7 @@ const PDFViewer = () => {
     }
 
     return (
-      <div>
+      <div style={{width: '45%'}}>
         <h2>Uploaded PDF:</h2>
         <iframe src={`https://docs.google.com/viewer?url=${pdfURL}&embedded=true`} title="pdf-viewer" width="100%" height="600px" />
       </div>
@@ -84,16 +84,18 @@ const PDFViewer = () => {
     }
 
     return (
-      <div>
+      <div style={{width: '45%'}}>
         <h2>OCR Results:</h2>
+        <div style={{ overflowY: 'auto', maxHeight: '600px' /* Define your desired height here */ }}>
         {ocrResult.map((result, index) => (
-          <div key={index}
+          <div style={{border: '1px solid', padding: "5px 5px"}}key={index}
           contentEditable="true"
           >
             {/* Assuming each element in the ocrResult array is a string */}
             <p>{result['text']}</p>
           </div>
         ))}
+        </div>
          <button onClick={handleOCRConfirm}>Confirm OCR Results</button>
       </div>
     );
@@ -170,8 +172,11 @@ const PDFViewer = () => {
     <div>
       <input type="file" onChange={handleFileChange} accept=".pdf" />
       <button onClick={handleUpload}>Upload PDF</button>
-      {displayPDF()}
-      {displayOCRResult()}
+      <div style={{display: 'flex', justifyContent: 'space-between', padding: '10px'}}>
+        {displayPDF()}
+        {displayOCRResult()}
+      </div>
+
       {displayChat()}
     </div>
   );
