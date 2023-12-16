@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
 
 const PDFViewer = () => {
@@ -14,6 +14,7 @@ const PDFViewer = () => {
     const selectedFile = e.target.files[0];
     setPdfFile(selectedFile);
   };
+  const elementRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   const handleUpload = async () => {
     try {
@@ -48,36 +49,35 @@ const PDFViewer = () => {
   };
 
   const handleOCRConfirm = async () => {
-    // Add your logic here to handle the click event
-    //console.log('Button clicked!');
-    //send to embed
+    // Send confirmation to embedding service
     try{
-  
-      const response = await fetch('http://127.0.0.1:5000/create_embeddings', {
+      const updatedElements = elementRefs.current.map((ref) => {
+        if (ref) {
+          return {
+            id: ref.dataset.id,
+            text: ref.innerText,
+          };
+        }
+      });
+
+      const response = await fetch('http://127.0.0.1:5000/confirm_results', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Set the content type to JSON
         },
-        body: JSON.stringify({ file_id: fileId }), // Stringify the body if it's JSON data
+        body: JSON.stringify({ file_id: fileId , confirmed_elements: updatedElements}),
       });
       if (response.ok) {
         // Request was successful
         const data = await response.json();
-        // Update your state variable based on the response data or set it to true
         setChatReady(true);
-      
       }
     }
     catch (error) {
       console.error('Error during OCR:', error);
     }
-    //if ok
-
-
-    // For example, if you want to perform an action when the button is clicked, you can add your code here.
-    // For now, let's just display an alert as an example.
-    //alert('Button clicked!');
   };
+
   const displayOCRResult = () => {
     if (ocrResult.length == 0) {
       return <div></div>;
@@ -86,17 +86,19 @@ const PDFViewer = () => {
     return (
       <div style={{width: '45%'}}>
         <h2>OCR Results:</h2>
-        <div style={{ overflowY: 'auto', maxHeight: '600px' /* Define your desired height here */ }}>
+        <div style={{ overflowY: 'auto', maxHeight: '600px'}}>
         {ocrResult.map((result, index) => (
-          <div style={{border: '1px solid', padding: "5px 5px"}}key={index}
-          contentEditable="true"
+          <div style={{border: '1px solid', padding: "5px 5px"}}
+            key={index}
+            contentEditable="true"
+            ref={(element) => (elementRefs.current[index] = element)}
+            data-id={result['id']}
           >
-            {/* Assuming each element in the ocrResult array is a string */}
             <p>{result['text']}</p>
           </div>
         ))}
         </div>
-         <button onClick={handleOCRConfirm}>Confirm OCR Results</button>
+        <button onClick={handleOCRConfirm}>Confirm OCR Results</button>
       </div>
     );
   };
@@ -106,18 +108,15 @@ const PDFViewer = () => {
     // TODO: Add logic to generate new chat output based on the user input
     // For now, let's echo the user input
     try{
-  
       const response = await fetch('http://127.0.0.1:5000/chat-prompt', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', // Set the content type to JSON
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ file_id: fileId, message: userInput }), // Stringify the body if it's JSON data
+        body: JSON.stringify({ file_id: fileId, message: userInput }),
       });
       if (response.ok) {
-        // Request was successful
         const data = await response.json();
-        // Update your state variable based on the response data or set it to true
         setChatOutput(`SkuleSpark: ${data.answer}`);
         setSources(data.sources)
         setUserInput('');
@@ -158,7 +157,6 @@ const PDFViewer = () => {
             <h3>Sources: </h3>
             {sources.map((source, index) => (
               <div key={index}>
-                {/* Assuming each element in the ocrResult array is a string */}
                 <p>{source}</p>
               </div>
             ))}
