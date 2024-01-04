@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
-
+import AugmentedNote from '../pages/AugmentedNote';
 const PDFViewer = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfURL, setPdfURL] = useState('');
@@ -10,6 +10,7 @@ const PDFViewer = () => {
   const [userInput, setUserInput] = useState('')
   const [chatOutput, setChatOutput] = useState('')
   const [sources, setSources] = useState([])
+  const [notesElements, setNotesElements] = useState([])
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setPdfFile(selectedFile);
@@ -71,6 +72,7 @@ const PDFViewer = () => {
         // Request was successful
         const data = await response.json();
         setChatReady(true);
+        getAugmentedNotes();
       }
     }
     catch (error) {
@@ -102,7 +104,29 @@ const PDFViewer = () => {
       </div>
     );
   };
-
+  const getAugmentedNotes = async () =>{
+    try{
+      const response = await fetch(`http://127.0.0.1:5000/augmented-note/${fileId}`, {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data)
+        setNotesElements(data)
+      
+      }
+    }
+    catch (error) {
+      console.error('Error during fetching augmented notes:', error);
+    }
+  }
+  const displayAugmentedNotes = () => {
+    if (notesElements.length<=0){
+      return <div></div>;
+    }
+    
+    return <div className='augmented-notes-wrapper'> <AugmentedNote elements={notesElements} /> </div>
+  }
 
   const updateChat = async () => {
     // TODO: Add logic to generate new chat output based on the user input
@@ -128,7 +152,6 @@ const PDFViewer = () => {
     }
     
   };
-
   const displayChat = () => {
     if (!chatReady) {
       return <div></div>;
@@ -174,7 +197,7 @@ const PDFViewer = () => {
         {displayPDF()}
         {displayOCRResult()}
       </div>
-
+      {displayAugmentedNotes()}
       {displayChat()}
     </div>
   );

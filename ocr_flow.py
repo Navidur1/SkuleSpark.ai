@@ -83,7 +83,9 @@ def ocr_flow(uploaded_file, file_id):
     elements_response = []
 
     # Store elements in mongoDB
-    for data in json_response:
+    for ind, data in enumerate(json_response):
+        data["file_id"] = file_id
+        data["element_index"] = ind
         success, _id = insert_one('Elements', data)
 
         if not success:
@@ -91,7 +93,7 @@ def ocr_flow(uploaded_file, file_id):
 
         obj = {
             'id': str(_id),
-            'text': data['text']
+            'text': data['text'],
         }
 
         elements_response.append(obj)
