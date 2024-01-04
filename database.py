@@ -60,8 +60,9 @@ def update_one(collection_name, filter, update):
         collection = db_client[collection_name]
         result = collection.update_one(filter, update)
 
-        if result.modified_count > 0:
+        if result.matched_count > 0:
             return (True, "Update Successful")
+        
         else:
             return (False, "No matching documents found")
         
@@ -77,6 +78,7 @@ def delete_one(collection_name, filter):
 
         if result.deleted_count > 0:
             return (True, "Delete Successful")
+        
         else:
             return (False, "No matching documents found")
         
@@ -92,6 +94,7 @@ def insert_one(collection_name, data):
 
         if result.inserted_id:
             return (True, result.inserted_id)
+        
         else:
             return (False, "Failed to insert document")
 

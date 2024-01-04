@@ -44,9 +44,7 @@ def get_relevant_sources(message, file_id):
         print(chunk)
         text = chunk['text']
 
-        #print(match['score'], text)
         if (match['score'] < 0.77):
-            #continue
             pass
 
         tokens += num_tokens_from_string(text)
@@ -58,7 +56,6 @@ def get_relevant_sources(message, file_id):
     return context
 
 def get_augmented_message(message, sources):
-    
     source_introduction = f"Context from student's notes:\n\n" #"Use the following information, retrieved from relevant financial documents, to help answer the subsequent question.\n\n"
     augmented_message = source_introduction
     source_text = ""
@@ -72,7 +69,6 @@ def get_augmented_message(message, sources):
     return augmented_message
 
 def get_gpt_response(augmented_message):
-
     messages = [{
                     "role": "system", 
                     "content": "You are a helpful tutor that specializes in answering student questions. If relevant, consider the provided context while formulating your answer."
