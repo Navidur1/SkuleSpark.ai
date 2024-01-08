@@ -58,7 +58,7 @@ def upload_pdf():
     
     return jsonify({'gcs_pdf_url': "fake"}), 400
 
-def ocr_flow(uploaded_file, file_id):
+def ocr_flow(uploaded_file, skule_scrape = False):
     url = "https://api.unstructured.io/general/v0/general"
 
     headers = {
@@ -84,7 +84,10 @@ def ocr_flow(uploaded_file, file_id):
 
     # Store elements in mongoDB
     for data in json_response:
-        success, _id = insert_one('Elements', data)
+        _id = '_'
+        success = True
+        if not skule_scrape:
+            success, _id = insert_one('Elements', data)
 
         if not success:
             break
