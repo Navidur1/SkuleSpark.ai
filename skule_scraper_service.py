@@ -80,9 +80,10 @@ def process_pdf_files(directory, course):
 
     with open(f'{directory}/pdf_url.txt', 'r') as file:
         for url in file:
-            success, data = get_data_one('Exams', {'url': url}, {'_id': 1})
+            pdf_url = url.strip()
+            success, data = get_data_one('Exams', {'url': pdf_url}, {'_id': 1})
             if success and data:
-                print(f"Already parsed exam {url}. Skipping...")
+                print(f"Already parsed exam {pdf_url}. Skipping...")
                 continue
 
             pdf_url = url.strip()
@@ -92,7 +93,7 @@ def process_pdf_files(directory, course):
             
             # Create exam object
             exam_object = {
-                'url': url,
+                'url': pdf_url,
                 'course': course
             }
             _, exam_id = insert_one('Exams', exam_object)
