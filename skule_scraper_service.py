@@ -78,49 +78,6 @@ def process_pdf_files(directory, course):
     # Download PDF from url
     target_directory = 'parsed_files'
 
-<<<<<<< HEAD
-    # Iterate over the files in the directory
-    for filename in os.listdir(directory):
-        filepath = os.path.join(directory, filename)
-        if os.path.isfile(filepath) and filepath.lower().endswith('.pdf'):
-            # Perform actions on each PDF file here
-            # For example, you could use a PDF processing library like PyPDF2 or pdftotext
-            # to read, manipulate, or extract information from the PDF files.
-            # Example using PyPDF2:
-            # 
-            with open(filepath, 'rb') as file:
-                # Create a FileStorage object
-                print(f"Processing '{filename}'...")
-                file_storage = FileStorage(file)
-                _, ocr_results = ocr_flow(file_storage, None, skule_scrape=True)
-
-                exam_text = ""
-                for elem in ocr_results:
-                    exam_text += elem['text']
-                
-                try:
-                    result = get_gpt_response(exam_text)
-
-                    print("Retrieved " + len(result['exam_questions']) + " questions from exam")
-
-                    # Make results directory
-                    new_directory = os.path.join(directory, target_directory)
-                    if not os.path.exists(new_directory):
-                        os.makedirs(new_directory)
-
-                    # Move the current file to the new directory
-                    new_filepath = os.path.join(new_directory, filename)
-                    file.close()
-                    shutil.move(filepath, new_filepath)
-
-                    # Store and Embed retireved questions 
-                    # for question in result:
-                    #     success, question_id = insert_one('Exams')
-
-                    print(f"Succesfully parsed '{filename}' and moved to {new_directory}.")
-                except:
-                    print(f"Could not retrieve questions for file '{filename}")
-=======
     with open(f'{directory}/pdf_url.txt', 'r') as file:
         for url in file:
             success, data = get_data_one('Exams', {'url': url}, {'_id': 1})
@@ -147,7 +104,7 @@ def process_pdf_files(directory, course):
                     # Create a FileStorage object
                     print(f"Processing '{filename}'...")
                     file_storage = FileStorage(file)
-                    _, ocr_results = ocr_flow(file_storage, skule_scrape=True)
+                    _, ocr_results = ocr_flow(file_storage, None, skule_scrape=True)
 
                     exam_text = ""
                     for elem in ocr_results:
@@ -183,9 +140,6 @@ def process_pdf_files(directory, course):
                     except Exception as e:
                         print(f"Could not retrieve questions for file '{filename}")
                         print(e)
->>>>>>> 615acd4 (add in embedding feature)
-
-
 
 if __name__ == "__main__":
     # Check if the correct number of command-line arguments is provided
