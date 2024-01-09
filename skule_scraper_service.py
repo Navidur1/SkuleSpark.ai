@@ -8,6 +8,7 @@ import tiktoken
 import shutil
 from dotenv import load_dotenv,find_dotenv
 from database import insert_one, get_data_one, update_one, pc_get_many, pc_insert_one
+from bson.objectid import ObjectId
 import requests
 
 # Set up open ai 
@@ -50,6 +51,19 @@ def get_gpt_response(exam):
     return json.loads(response.choices[0].message.content)
 
 
+def download_pdf(url, save_path):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            with open(save_path, 'wb') as file:
+                file.write(response.content)
+                file.close()
+            print(f"PDF downloaded and saved at: {save_path}")
+        else:
+            print(f"Failed to download the PDF. Status code: {response.status_code}")
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+
 def process_pdf_files(directory, course):
     # Check if the provided directory exists
     if not os.path.exists(directory):
@@ -64,47 +78,68 @@ def process_pdf_files(directory, course):
     # Download PDF from url
     target_directory = 'parsed_files'
 
-    # Iterate over the files in the directory
-    for filename in os.listdir(directory):
-        filepath = os.path.join(directory, filename)
-        if os.path.isfile(filepath) and filepath.lower().endswith('.pdf'):
-            # Perform actions on each PDF file here
-            # For example, you could use a PDF processing library like PyPDF2 or pdftotext
-            # to read, manipulate, or extract information from the PDF files.
-            # Example using PyPDF2:
-            # 
-            with open(filepath, 'rb') as file:
-                # Create a FileStorage object
-                print(f"Processing '{filename}'...")
-                file_storage = FileStorage(file)
-                _, ocr_results = ocr_flow(file_storage, skule_scrape=True)
+    with open(f'{directory}/pdf_url.txt', 'r') as file:
+        for url in file:
+            success, data = get_data_one('Exams', {'url': url}, {'_id': 1})
+            if success and data:
+                print(f"Already parsed exam {url}. Skipping...")
+                continue
 
-                exam_text = ""
-                for elem in ocr_results:
-                    exam_text += elem['text']
-                
-                try:
-                    result = get_gpt_response(exam_text)
+            pdf_url = url.strip()
+            filename = pdf_url.split('/')[-1]
+            save_path = os.path.join(directory, filename)
+            download_pdf(pdf_url, save_path)
+            
+            # Create exam object
+            exam_object = {
+                'url': url,
+                'course': course
+            }
+            _, exam_id = insert_one('Exams', exam_object)
 
-                    print("Retrieved " + len(result['exam_questions']) + " questions from exam")
+            # Iterate over the files in the directory
+            filepath = save_path
+            if os.path.isfile(filepath) and filepath.lower().endswith('.pdf'):
+                with open(filepath, 'rb') as file:
+                    # Create a FileStorage object
+                    print(f"Processing '{filename}'...")
+                    file_storage = FileStorage(file)
+                    _, ocr_results = ocr_flow(file_storage, skule_scrape=True)
 
-                    # Make results directory
-                    new_directory = os.path.join(directory, target_directory)
-                    if not os.path.exists(new_directory):
-                        os.makedirs(new_directory)
+                    exam_text = ""
+                    for elem in ocr_results:
+                        exam_text += elem['text']
+                    
+                    try:
+                        result = get_gpt_response(exam_text)
 
-                    # Move the current file to the new directory
-                    new_filepath = os.path.join(new_directory, filename)
-                    file.close()
-                    shutil.move(filepath, new_filepath)
+                        print("Retrieved " + str(len(result['exam_questions'])) + " questions from exam")
 
-                    # Store and Embed retireved questions 
-                    # for question in result:
-                    #     success, question_id = insert_one('Exams')
+                        # Make results directory
+                        new_directory = os.path.join(directory, target_directory)
+                        if not os.path.exists(new_directory):
+                            os.makedirs(new_directory)
 
-                    print(f"Succesfully parsed '{filename}' and moved to {new_directory}.")
-                except:
-                    print(f"Could not retrieve questions for file '{filename}")
+                        # Move the current file to the new directory
+                        new_filepath = os.path.join(new_directory, filename)
+                        file.close()
+                        shutil.move(filepath, new_filepath)
+
+                        # Store and Embed retireved questions
+                        for question in result['exam_questions']:
+                            question_object = {
+                                'exam_id': ObjectId(exam_id),
+                                'text': question
+                            }
+                            _, question_id = insert_one('Questions', question_object)
+                            embedding_res = client.embeddings.create(input=question, model=embedding_model)
+                            pinecone_entry = (str(question_id), embedding_res.data[0].embedding, {"course": course})
+                            success = pc_insert_one([pinecone_entry])                         
+
+                        print(f"Succesfully parsed '{filename}' and moved to {new_directory}.")
+                    except Exception as e:
+                        print(f"Could not retrieve questions for file '{filename}")
+                        print(e)
 
 
 
