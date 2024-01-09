@@ -105,7 +105,6 @@ def process_pdf_files(directory, course):
                     print(f"Processing '{filename}'...")
                     file_storage = FileStorage(file)
                     _, ocr_results = ocr_flow(file_storage, None, skule_scrape=True)
-
                     exam_text = ""
                     for elem in ocr_results:
                         exam_text += elem['text']
