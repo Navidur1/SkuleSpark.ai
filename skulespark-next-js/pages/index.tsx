@@ -1,6 +1,9 @@
 import React, { useState, useRef } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
 import AugmentedNote from '../pages/AugmentedNote';
+import SkuleSparkHeader from './skulespark_header';
+import SkuleSparkBody from './skulespark_body';
+
 const PDFViewer = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfURL, setPdfURL] = useState('');
@@ -221,25 +224,8 @@ const PDFViewer = () => {
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} accept=".pdf"/>
-      <div>
-        <input type="radio" id="typed" name="note-type" value="typed" onChange={handleNoteTypeChange}/>
-        <label for="typed">Typed</label>
-
-        <input type="radio" id="handwritten" name="note-type" value="handwritten" onChange={handleNoteTypeChange}/>
-        <label for="handwritten">Handwritten</label>
-
-        <input type="radio" id="both" name="note-type" value="both" onChange={handleNoteTypeChange}/>
-        <label for="both">Typed + Handwritten</label>
-      </div>
-      <button onClick={handleUpload}>Upload PDF</button>
-      <button onClick={createCourse}>Create Course</button>
-      <div style={{display: 'flex', justifyContent: 'space-between', padding: '10px'}}>
-        {displayPDF()}
-        {displayOCRResult()}
-      </div>
-      {displayAugmentedNotes()}
-      {displayChat()}
+      <SkuleSparkHeader/>
+      <SkuleSparkBody/>
     </div>
   );
 };

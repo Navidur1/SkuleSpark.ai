@@ -1,0 +1,14 @@
+.skulespark_header {
+    background-color: #112a9a;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    height: 4vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+.skulespark_header h1{
+    margin: 0;
+}
