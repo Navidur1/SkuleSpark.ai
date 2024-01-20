@@ -19,12 +19,12 @@ const SkuleSparkBody = () => {
             </div>
             {showAdditionalColumns && (
                 <>
-                    <div className="column">New Column 1</div>
-                    <div className="column">New Column 2</div>
+                    <div className="column courseColumn">Classes go here</div>
+                    <div className="column noteColumn">Note name goes here</div>
                 </>
                 )}
-            <div className={`column column2 ${showAdditionalColumns ? 'small' : ''}`}>Column 2</div>
-            <div className = "column column3">Column 3</div>
+            <div className={`column column2 ${showAdditionalColumns ? 'small' : ''}`}> Augmented Note would get shown here</div>
+            <div className = "column column3">No note selected. Select a Note to access AI features!</div>
         </div>
     );
 };

@@ -2,28 +2,36 @@
     display: flex;
     flex-wrap: wrap;
     height: 93vh;
-  }
+}
   
-  .column {
+.column {
     box-sizing: border-box;
     padding: 10px;
     border: 1px solid black;
-  }
+}
   
-  .column1 {
+.column1 {
     width: 2%;
     height: 100%;
-  }
+}
   
-  .column2 {
+.column2 {
     flex: 1;
     height: 100%;
-  }
+}
   
-  .column3 {
+.column3 {
     width: 25%;
     height: 100%;
-  }
+}
+
+.courseColumn{
+    max-width: 120px;
+}
+
+.noteColumn{
+    max-width: 120px;
+}
 
 .sidebarButton{
     width: 35px;
@@ -32,6 +40,10 @@
     border: none;
     padding: 0;
     cursor: pointer;
+}
+
+.sidebarButton:hover{
+    background-color: lightgray;
 }
 
 .sidebarButtonImage{
