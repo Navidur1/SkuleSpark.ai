@@ -24,7 +24,7 @@ encoding = tiktoken.encoding_for_model(model_id)
 
 def get_augmented_message(exam):
 
-    augmented_message = f"Exam text:\n\n" #"Use the following information, retrieved from relevant financial documents, to help answer the subsequent question.\n\n"
+    augmented_message = f"Exam text:\n\n"
     augmented_message += exam
     augmented_message += f"\n\nTry your best retrieve all the text from the exam questions and put it into an array named exam_questions. This array is an array of strings that holds the all of the text of each question in the exam."
 
