@@ -25,6 +25,14 @@ def upload_pdf():
     if pdf_file.filename == '':
         return 'No selected file', 400
     
+    data = request.form
+
+    if 'note_type' not in data:
+        return 'No "note_type" provided', 400
+        
+    # TO DO:
+    # Use note_type to use different models
+    
     # Get the bucket where you want to upload the file
     bucket = storage_client.bucket(bucket_name)
 
