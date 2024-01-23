@@ -11,16 +11,28 @@ const PDFViewer = () => {
   const [chatOutput, setChatOutput] = useState('')
   const [sources, setSources] = useState([])
   const [notesElements, setNotesElements] = useState([])
+  const [noteType, setNoteType] = useState(null)
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setPdfFile(selectedFile);
   };
+
+  const handleNoteTypeChange = (e) => {
+    setNoteType(e.target.value)
+  }
+
   const elementRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   const handleUpload = async () => {
     try {
+      if(noteType == null){
+        return // Should indicate some sort of alert to the user
+      }
+      
       const formData = new FormData();
       formData.append('pdf', pdfFile);
+      formData.append('note_type', noteType);
 
       const response = await fetch('http://127.0.0.1:5000/upload', {
         method: 'POST',
@@ -191,7 +203,17 @@ const PDFViewer = () => {
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} accept=".pdf" />
+      <input type="file" onChange={handleFileChange} accept=".pdf"/>
+      <div>
+        <input type="radio" id="typed" name="note-type" value="typed" onChange={handleNoteTypeChange}/>
+        <label for="typed">Typed</label>
+
+        <input type="radio" id="handwritten" name="note-type" value="handwritten" onChange={handleNoteTypeChange}/>
+        <label for="handwritten">Handwritten</label>
+
+        <input type="radio" id="both" name="note-type" value="both" onChange={handleNoteTypeChange}/>
+        <label for="both">Typed + Handwritten</label>
+      </div>
       <button onClick={handleUpload}>Upload PDF</button>
       <div style={{display: 'flex', justifyContent: 'space-between', padding: '10px'}}>
         {displayPDF()}
