@@ -58,7 +58,7 @@ def upload_pdf():
     
     return jsonify({'gcs_pdf_url': "fake"}), 400
 
-def ocr_flow(uploaded_file, file_id):
+def ocr_flow(uploaded_file, file_id, skule_scrape = False):
     url = "https://api.unstructured.io/general/v0/general"
 
     headers = {
@@ -86,8 +86,10 @@ def ocr_flow(uploaded_file, file_id):
     for ind, data in enumerate(json_response):
         data["file_id"] = file_id
         data["element_index"] = ind
-        success, _id = insert_one('Elements', data)
-
+        _id = '_'
+        success = True
+        if not skule_scrape:
+            success, _id = insert_one('Elements', data)
         if not success:
             break
 
