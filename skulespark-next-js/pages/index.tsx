@@ -48,6 +48,25 @@ const PDFViewer = () => {
     }
   };
 
+  const createCourse = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/course', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Set the content type to JSON
+        },
+        body: JSON.stringify({course_code: "ECE334"}),
+      });
+      if (response.ok) {
+        // Request was successful
+        const data = await response.json();
+      }
+    }
+    catch (error) {
+      console.error('Error during OCR:', error);
+    }
+  }
+
   const displayPDF = () => {
     if (!pdfURL) {
       return <div>No PDF uploaded</div>;
@@ -215,6 +234,7 @@ const PDFViewer = () => {
         <label for="both">Typed + Handwritten</label>
       </div>
       <button onClick={handleUpload}>Upload PDF</button>
+      <button onClick={createCourse}>Create Course</button>
       <div style={{display: 'flex', justifyContent: 'space-between', padding: '10px'}}>
         {displayPDF()}
         {displayOCRResult()}
