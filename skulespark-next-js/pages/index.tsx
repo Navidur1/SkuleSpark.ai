@@ -4,7 +4,7 @@ import AugmentedNote from '../pages/AugmentedNote';
 import SkuleSparkHeader from './skulespark_header';
 import SkuleSparkBody from './skulespark_body';
 
-const PDFViewer = () => {
+const App = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfURL, setPdfURL] = useState('');
   const [ocrResult, setOCRResult] = useState([]);
@@ -230,4 +230,4 @@ const PDFViewer = () => {
   );
 };
 
-export default PDFViewer;
+export default App;
