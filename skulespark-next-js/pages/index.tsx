@@ -61,11 +61,10 @@ const PDFViewer = () => {
         // Request was successful
         const data = await response.json();
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error during OCR:', error);
     }
-  }
+  };
 
   const displayPDF = () => {
     if (!pdfURL) {
@@ -97,7 +96,7 @@ const PDFViewer = () => {
         headers: {
           'Content-Type': 'application/json', // Set the content type to JSON
         },
-        body: JSON.stringify({ file_id: fileId , confirmed_elements: updatedElements}),
+        body: JSON.stringify({file_id: fileId , confirmed_elements: updatedElements, course_code: "ECE334" /*Change this to dynamic*/}),
       });
       if (response.ok) {
         // Request was successful
