@@ -60,7 +60,7 @@ def create_course():
     if not success:
         return error_message, 400
 
-    return "Successfully created course", 200
+    return jsonify("Successfully created course"), 200
 
 @crud_notes.route('/file_structure/<user_id>', methods=['GET'])
 def get_file_structure(user_id):

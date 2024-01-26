@@ -114,6 +114,13 @@ const SkuleSparkBody = ({fileStructure}) => {
         const data = await response.json();
         console.log('Course created:', data);
 
+        const newCourse: Course = {
+          course: newCourseName,
+          notes: []
+        };
+
+        setCourses((courses) => [...courses, newCourse]);
+
         // Increment the key to force re-render of CourseList
         setCourseListKey((prevKey) => prevKey + 1);
 
