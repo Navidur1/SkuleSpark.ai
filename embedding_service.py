@@ -28,19 +28,15 @@ def create_embeddings():
     if 'confirmed_elements' not in data:
         return "No 'confirmed_elements' found in the provided data.", 400
     
-    if 'course_code' not in data:
-        return "No 'course_code' found in the provided data", 400
-    
     file_id = data['file_id']
     confirmed_elements = data['confirmed_elements']
-    course_code = data['course_code']
 
     success = chunk_elements(confirmed_elements, file_id)
 
     if not success:
         return "Could not chunk elements.", 400
 
-    success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1, 'file_name': 1, 'gcs_link': 1})
+    success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1, 'file_name': 1, 'gcs_link': 1, 'course': 1})
 
     if not success:
         return "Could not retrieve file", 400
@@ -48,6 +44,7 @@ def create_embeddings():
     chunks = data['chunk_ids']
     file_name = data['file_name']
     gcs_link = data['gcs_link']
+    course_code = data['course']
 
     for chunk_id in chunks:
         text_to_embed = ""

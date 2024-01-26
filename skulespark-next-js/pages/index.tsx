@@ -6,24 +6,6 @@ const App = () => {
 
   const [fileStructure, setFileStructure] = useState([]);
 
-  const createCourse = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/course', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // Set the content type to JSON
-        },
-        body: JSON.stringify({course_code: "ECE334"}), /*TODO: Change this to dynamic*/
-      });
-      if (response.ok) {
-        // Request was successful
-        const data = await response.json();
-      }
-    } catch (error) {
-      console.error('Error during OCR:', error);
-    }
-  };
-
   useEffect(() => {
     const fetchFileStructure = async () => {
       try {

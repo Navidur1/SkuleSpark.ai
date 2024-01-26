@@ -266,7 +266,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         headers: {
           'Content-Type': 'application/json', // Set the content type to JSON
         },
-        body: JSON.stringify({file_id: fileId , confirmed_elements: updatedElements, course_code: "ECE334" /*TODO: Change this to dynamic*/}),
+        body: JSON.stringify({file_id: fileId , confirmed_elements: updatedElements}),
       });
       if (response.ok) {
         // Request was successful
