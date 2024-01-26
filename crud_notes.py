@@ -64,7 +64,7 @@ def create_course():
 
 @crud_notes.route('/file_structure/<user_id>', methods=['GET'])
 def get_file_structure(user_id):
-    success, file_structure = get_data_one('Users', {'_id': user_id}, {'courses': 1})
+    success, file_structure = get_data_one('Users', {'name': 'Dummy'}, {'courses': 1}) # Later on: {'_id': user_id}
 
     if not success:
         return "Could not fetch file structure", 400
@@ -75,5 +75,9 @@ def get_file_structure(user_id):
 
 @crud_notes.route('/note/<note_id>', methods=['GET'])
 def get_note(note_id):
-    return
-    # Return whatever we need for frontend
+    success, data = get_data_one('Files', {'_id': note_id}, {'gcs_link': 1})
+
+    if not success:
+        return "Could not fetch note", 400
+
+    return data['gcs_link']
