@@ -1,6 +1,7 @@
 from flask import Blueprint, request, json, jsonify
 from database import get_data, get_data_one, update_one
 from bson.objectid import ObjectId
+from bson import json_util
 
 crud_notes = Blueprint('crud_notes', __name__)
 
@@ -59,4 +60,16 @@ def create_course():
     if not success:
         return error_message, 400
 
-    return "Successfully created course", 200
+    return jsonify("Successfully created course"), 200
+
+@crud_notes.route('/file_structure/<user_id>', methods=['GET'])
+def get_file_structure(user_id):
+    success, file_structure = get_data_one('Users', {'name': 'Dummy'}, {'courses': 1}) # Later on: {'_id': user_id}
+
+    if not success:
+        return "Could not fetch file structure", 400
+    
+    data = file_structure['courses']
+
+    return json.loads(json_util.dumps(data))
+

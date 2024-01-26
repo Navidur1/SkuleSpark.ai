@@ -21,7 +21,7 @@ embedding_model = "text-embedding-ada-002"
 def create_embeddings():
     data = request.json
 
-    # Check if 'file_id' and 'elements' exists in the data dictionary
+    # Check if 'file_id', 'elements', and 'course_id' exists in the data dictionary
     if 'file_id' not in data:
         return "No 'file_id' found in the provided data.", 400
     
@@ -36,12 +36,15 @@ def create_embeddings():
     if not success:
         return "Could not chunk elements.", 400
 
-    success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1})
+    success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1, 'file_name': 1, 'gcs_link': 1, 'course': 1})
 
     if not success:
         return "Could not retrieve file", 400
     
     chunks = data['chunk_ids']
+    file_name = data['file_name']
+    gcs_link = data['gcs_link']
+    course_code = data['course']
 
     for chunk_id in chunks:
         text_to_embed = ""
@@ -54,6 +57,11 @@ def create_embeddings():
         if not success:
             return "Error"
         
+    success, error_message = update_one('Users', {'name': "Dummy", 'courses.course': course_code}, {'$push': {'courses.$.notes': {'_id': ObjectId(file_id), 'file_name': file_name, 'gcs_link': gcs_link}}})
+
+    if not success:
+        return error_message, 400
+
     return jsonify("Embed success"), 200
 
 def chunk_elements(elements, file_id):

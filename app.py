@@ -7,6 +7,7 @@ from chat import chat_service
 from ocr_flow import ocr_service
 from embedding_service import embedding_service
 from crud_notes import crud_notes
+from database import get_data
 
 app = Flask(__name__)
 app.register_blueprint(chat_service)
@@ -20,7 +21,6 @@ CORS(app)
 @app.route('/')
 def index():
     return ""
-
 
 if __name__ == '__main__':
     app.run(debug=True)
