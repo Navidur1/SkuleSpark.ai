@@ -1,4 +1,4 @@
-from flask import Blueprint, request, json, jsonify
+from flask import Blueprint, request, json, jsonify,  Response
 import requests
 from bson.objectid import ObjectId
 from openai import OpenAI
@@ -7,7 +7,7 @@ import os
 import tiktoken
 from dotenv import load_dotenv,find_dotenv
 from database import pc_get_many, get_data_one
-
+import time
 
 # Set up open ai 
 dotenv_path = find_dotenv(raise_error_if_not_found=True)
@@ -30,8 +30,9 @@ def num_tokens_from_string(string: str):
 
 def get_relevant_sources(message, file_id):
     message_embedding = client.embeddings.create(input=message, model=embedding_model).data[0].embedding
+    print("FILEW ID", file_id)
     success, query_results = pc_get_many(message_embedding,file_id)
-    print(query_results)
+    print("PEPEPEGA", query_results)
     if not success:
         return ""
 
@@ -45,7 +46,7 @@ def get_relevant_sources(message, file_id):
         text = chunk['text']
 
         if (match['score'] < 0.77):
-            pass
+            pass 
 
         tokens += num_tokens_from_string(text)
         if tokens > MAX_TOKENS:
@@ -68,10 +69,10 @@ def get_augmented_message(message, sources):
 
     return augmented_message
 
-def get_gpt_response(augmented_message):
+def get_gpt_response(augmented_message,sources,streaming):
     messages = [{
                     "role": "system", 
-                    "content": "You are a helpful tutor that specializes in answering student questions. If relevant, consider the provided context while formulating your answer."
+                    "content": "You are a helpful tutor that specializes in answering student questions. Consider the provided context while formulating your answer. If the context is not relevant let the student know"
                 },
                 {
                     "role": "user",
@@ -81,22 +82,46 @@ def get_gpt_response(augmented_message):
     response = client.chat.completions.create(
         model = model_id,
         messages = messages,
-        stream=False
+        stream=streaming
     )
-    return response.choices[0].message.content
+    if streaming:
+        for chunk in response:
+            if chunk.choices[0].delta.content:
+                yield json.dumps({ "type": "answer", "data":chunk.choices[0].delta.content})
+        print("sources", sources)
+        yield json.dumps({"type": "reference", "data": sources})
+
+    else:       
+        return response.choices[0].message.content
 
 @chat_service.route('/chat-prompt', methods=['POST'])
 def handle_chat_prompt():
     req_body = request.json
     user_message_orig = req_body['message']
     file_id = req_body['file_id']
+    streaming = True
 
     sources = get_relevant_sources(user_message_orig,file_id)
     augmented_message = get_augmented_message(user_message_orig,sources)
-    chatgpt_response = get_gpt_response(augmented_message)
+    chatgpt_response = get_gpt_response(augmented_message,sources,streaming)
+    
+    def response_wrapper():
+        for response in chatgpt_response:
+            time.sleep(0.05)
+            yield (response)
+    
+    if streaming:
+        return Response(response_wrapper(), content_type='application/json')
+    else:
+        response_data ={
+            'answer' : chatgpt_response,
+            'sources': sources
+        }
+        return jsonify(response_data)
+    
 
-    response_data ={
-        'answer' : chatgpt_response,
-        'sources': sources
-    }
-    return jsonify(response_data)
+def generate_json_data():
+    # Your generator function logic here
+    for i in range(5):
+        yield json.dumps({"index": i}) + '\n'
+
