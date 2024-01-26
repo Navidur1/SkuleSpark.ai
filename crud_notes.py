@@ -73,11 +73,3 @@ def get_file_structure(user_id):
 
     return json.loads(json_util.dumps(data))
 
-@crud_notes.route('/note/<note_id>', methods=['GET'])
-def get_note(note_id):
-    success, data = get_data_one('Files', {'_id': note_id}, {'gcs_link': 1})
-
-    if not success:
-        return "Could not fetch note", 400
-
-    return data['gcs_link']

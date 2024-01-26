@@ -23,6 +23,7 @@
 .column3 {
     width: 25%;
     height: 100%;
+    overflow-y: auto;
 }
 
 .courseColumn{

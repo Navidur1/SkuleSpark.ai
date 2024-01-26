@@ -1,42 +1,39 @@
-// CourseNotes.tsx
-
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import {Course} from './course_list'
-
-export interface Note {
-  _id: string;
-  title: string;
-}
 
 interface CourseNotesProps {
   selectedCourse: Course | null;
+  onSelectNote: (note: Note) => void;
+  fileStructure: Course[];
 }
 
-const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse }) => {
-  const [notes, setNotes] = useState<Note[]>([]);
+export interface Course {
+  selectedCourse: Course | null;
+  onSelectNote: (note: Note) => void;
+  notes: Note[];
+}
 
-  useEffect(() => {
-    // Fetch the notes for the selected course from the server
-    if (selectedCourse) {
-      axios.get<{ notes: Note[] }>(`http://localhost:5000/get_notes`)
-        .then(response => setNotes(response.data.notes))
-        .catch(error => console.error('Error fetching notes:', error));
-    }
-  }, [selectedCourse]);
+export interface Note {
+  note_id: string;
+  gcs_link: string;
+  file_name: string;
+}
 
+const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse, onSelectNote, fileStructure }) => {
   return (
     <div>
-      <h2>Course Notes</h2>
-      {selectedCourse ? (
-        <ul>
-          {notes.map(note => (
-            <li key={note._id}>{note.title}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>Select a course to view notes.</p>
-      )}
+      <h2>Notes for {selectedCourse ? selectedCourse.course : 'No course selected'}</h2>
+      <ul>
+        {selectedCourse &&
+          fileStructure
+            .filter((course) => course.course === selectedCourse.course)
+            .map((course) =>
+              course.notes.map((note) => (
+                <li key={note.note_id}>
+                  <button onClick={() => onSelectNote(note)}>{note.file_name}</button>
+                </li>
+              ))
+            )}
+      </ul>
     </div>
   );
 };
