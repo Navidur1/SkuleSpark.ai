@@ -29,7 +29,12 @@ def upload_pdf():
 
     if 'note_type' not in data:
         return 'No "note_type" provided', 400
-        
+    
+    if 'course' not in data:
+        return 'No "course" provided', 400
+    
+    course = data['course']
+
     # TO DO:
     # Use note_type to use different models
     
@@ -49,7 +54,8 @@ def upload_pdf():
     data = {
         'gcs_link': gcs_pdf_url,
         'file_name': pdf_file.filename,
-        'chat_ready': False
+        'chat_ready': False,
+        'course': course
     }
 
     success, file_id = insert_one('Files', data)
