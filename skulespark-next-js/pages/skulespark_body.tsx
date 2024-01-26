@@ -32,7 +32,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [noteType, setNoteType] = useState(null)
   const [fileId, setFileId] = useState(null);
   const [noteListKey, setNoteListKey] = useState(0);
-  
+  const [examData, setExamData] = useState({});
 
   const handleButtonClick = () => {
     setShowAdditionalColumns(!showAdditionalColumns);
@@ -45,6 +45,7 @@ const SkuleSparkBody = ({fileStructure}) => {
 
   const handleSelectNote = (note: Note) => {
     setSelectedNote(note);
+    getQuiz(note);
   };
 
   const handleCreateCourse = () => {
@@ -156,6 +157,51 @@ const SkuleSparkBody = ({fileStructure}) => {
     }
     
   };
+
+  const displayQuiz = () => {
+    if (examData) {
+      return (
+        <div>
+          <h2>Recommended Exam Questions</h2>
+          {Object.keys(examData).map((examId) => (
+            <div key={examId} style={{ marginBottom: '20px' }}>
+              <strong>Skule URL:</strong>
+              <br />
+              <a href={examData[examId].exam_url} target="_blank" rel="noopener noreferrer">
+                {examData[examId].exam_url}
+              </a>
+              <br />
+              <strong style={{ marginTop: '10px', display: 'block' }}>Exam Questions:</strong>
+              <ul style={{ marginLeft: '20px', listStyleType: 'disc' }}>
+                {examData[examId].exam_questions.map((question, index) => (
+                  <li key={index} style={{ marginBottom: '30px' }}>{question}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      );
+    }
+  };
+
+  const getQuiz = async (note: Note) => {
+
+    try{
+      const response = await fetch(`http://127.0.0.1:5000/generate-quiz/${note?._id.$oid}/${selectedCourse?.course}`, {
+        method: 'GET',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setExamData(data)
+      }
+    }
+    catch (error) {
+      console.error('Error during fetching augmented notes:', error);
+    }
+
+  }
+
 
   const displayChat = () => {
     if (!chatReady) {
@@ -337,6 +383,7 @@ const SkuleSparkBody = ({fileStructure}) => {
       <div className="column column3">
         {/*{displayAugmentedNotes()}*/}
         {displayChat()}
+        {displayQuiz()}
       </div>
 
       {/* Popup for creating a new course */}
