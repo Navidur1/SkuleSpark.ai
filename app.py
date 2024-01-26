@@ -22,17 +22,5 @@ CORS(app)
 def index():
     return ""
 
-@app.route('/get_notes', methods=["GET"])
-def get_notes():
-    success, notes = get_data("Files")
-    if success:
-        # Extract filenames from the notes
-        file_names = [note.get('file_name', '') for note in notes]
-        print(file_names)
-        return jsonify({'file_names': file_names})
-    else:
-        return jsonify({'error': notes})
-
-
 if __name__ == '__main__':
     app.run(debug=True)
