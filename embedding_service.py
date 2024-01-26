@@ -40,12 +40,13 @@ def create_embeddings():
     if not success:
         return "Could not chunk elements.", 400
 
-    success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1})
+    success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1, 'file_name': 1})
 
     if not success:
         return "Could not retrieve file", 400
     
     chunks = data['chunk_ids']
+    file_name = data['file_name']
 
     for chunk_id in chunks:
         text_to_embed = ""
@@ -58,7 +59,7 @@ def create_embeddings():
         if not success:
             return "Error"
         
-    success, error_message = update_one('Users', {'name': "Dummy", 'courses.course': course_code}, {'$push': {'courses.$.notes': ObjectId(file_id)}})
+    success, error_message = update_one('Users', {'name': "Dummy", 'courses.course': course_code}, {'$push': {'courses.$.notes': {'_id': ObjectId(file_id), 'file_name': file_name}}})
 
     if not success:
         return error_message, 400
