@@ -1,5 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
 from goose3 import Goose
 
 #Skulespark@gmail.com key
