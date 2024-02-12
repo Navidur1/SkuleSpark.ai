@@ -99,4 +99,5 @@ def handle_chat_prompt():
         'answer' : chatgpt_response,
         'sources': sources
     }
+    
     return jsonify(response_data)

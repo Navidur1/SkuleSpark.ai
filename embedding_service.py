@@ -2,6 +2,7 @@ import pinecone
 import openai
 from database import insert_one, get_data_one, update_one, pc_get_many, pc_insert_one
 from flask import Blueprint, request, json, jsonify
+from async_service import create_summary
 from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -17,7 +18,7 @@ client = openai.OpenAI(
 
 embedding_model = "text-embedding-ada-002"
 
-@embedding_service.route('/confirm_results', methods=["POST"])
+@embedding_service.route('/confirm_results', methods=['POST'])
 def create_embeddings():
     data = request.json
 
@@ -31,10 +32,17 @@ def create_embeddings():
     file_id = data['file_id']
     confirmed_elements = data['confirmed_elements']
 
-    success = chunk_elements(confirmed_elements, file_id)
+    success, total_note_text = chunk_elements(confirmed_elements, file_id)
 
     if not success:
         return "Could not chunk elements.", 400
+
+    summary_dict = create_summary(total_note_text)
+
+    success, error_message = update_one('Files', {'_id': ObjectId(file_id)}, {'$set': {'summary': summary_dict['summary'], 'keywords': summary_dict['keywords']}})
+
+    if not success:
+        return "Could not create summary/keywords.", 400
 
     success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1, 'file_name': 1, 'gcs_link': 1, 'course': 1})
 
@@ -70,6 +78,7 @@ def chunk_elements(elements, file_id):
     stored_ids = []
     cur_element_ids = []
     cur_text = ""
+    total_note_text = ""
     chunk_success = True
 
     for i in range(len(elements)):
@@ -90,6 +99,7 @@ def chunk_elements(elements, file_id):
             cur_text = ""
             
         cur_text += data['text']
+        total_note_text += data['text']
         cur_element_ids.append(data['id'])
     
     if chunk_success:
@@ -106,6 +116,6 @@ def chunk_elements(elements, file_id):
         if not chunk_success:
             print(error_message)
             
-    return chunk_success
+    return chunk_success, total_note_text
 
 

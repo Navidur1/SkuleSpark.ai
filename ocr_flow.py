@@ -6,7 +6,6 @@ from io import BytesIO
 from google.cloud import storage
 from flask_cors import CORS
 
-
 ocr_service = Blueprint('ocr_service', __name__)
 
 credentials_path = 'credentials.json'
