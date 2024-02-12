@@ -2,6 +2,7 @@ import openai
 from flask import json
 import os
 from dotenv import load_dotenv, find_dotenv
+from webscrape import get_link
 
 # Set up open ai
 dotenv_path = find_dotenv(raise_error_if_not_found=True)
@@ -49,4 +50,13 @@ def create_summary(note_text):
 
     return result
 
+def get_all_links(search_terms):
+    ret = []
 
+    for term in search_terms:
+        response = get_link(term)
+
+        if response is not None:
+            ret.append(response)
+
+    return ret
