@@ -44,7 +44,7 @@ def create_embeddings():
     if not success:
         return "Could not create summary/keywords.", 400
 
-    links = get_all_links(summary_dict['keywords'])
+    links = get_all_links(summary_dict['keywords'], 2)
     print(links)
 
     success, error_message = update_one('Files', {'_id': ObjectId(file_id)}, {'$set': {'links': links}})
