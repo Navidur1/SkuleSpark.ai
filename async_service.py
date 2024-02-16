@@ -57,14 +57,12 @@ def get_all_links(search_terms, max_wikipedia):
     for term in search_terms:
         links = get_links(term)
         if links is not None:
-            add_link = True
-
             for link in links:
-                if add_link:
-                    if 'wikipedia' in link and wiki_count < max_wikipedia:
-                        all_links.append(link)
-                        wiki_count += 1
-                    elif 'wikipedia' not in link:
-                        all_links.append(link)
-                    add_link = False
+                if 'wikipedia' in link and wiki_count < max_wikipedia:
+                    all_links.append(link)
+                    wiki_count += 1
+                    break
+                elif 'wikipedia' not in link:
+                    all_links.append(link)
+                    break
     return all_links
