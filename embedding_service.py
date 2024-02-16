@@ -1,8 +1,7 @@
-import pinecone
 import openai
-from database import insert_one, get_data_one, update_one, pc_get_many, pc_insert_one
+from database import insert_one, get_data_one, update_one, pc_insert_one
 from flask import Blueprint, request, json, jsonify
-from async_service import create_summary, get_all_links
+from async_service import create_summary, get_all_links, get_all_videos
 from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -24,33 +23,37 @@ def create_embeddings():
 
     # Check if 'file_id', 'elements', and 'course_id' exists in the data dictionary
     if 'file_id' not in data:
-        return "No 'file_id' found in the provided data.", 400
+        return "No 'file_id' found in the provided data", 400
     
     if 'confirmed_elements' not in data:
-        return "No 'confirmed_elements' found in the provided data.", 400
+        return "No 'confirmed_elements' found in the provided data", 400
     
     file_id = data['file_id']
     confirmed_elements = data['confirmed_elements']
-
     success, total_note_text = chunk_elements(confirmed_elements, file_id)
 
     if not success:
-        return "Could not chunk elements.", 400
+        return "Could not chunk elements", 400
+
 
     summary_dict = create_summary(total_note_text)
-
-    success, error_message = update_one('Files', {'_id': ObjectId(file_id)}, {'$set': {'summary': summary_dict['summary'], 'keywords': summary_dict['keywords']}})
+    success, error_message = update_one('Files', {'_id': ObjectId(file_id)}, {'$set': {'summary': summary_dict['summary'], 'keywords': summary_dict['keywords'], 'chat_ready': True}})
 
     if not success:
-        return "Could not create summary/keywords.", 400
+        return "Could not create summary/keywords", 400
+
 
     links = get_all_links(summary_dict['keywords'], 2)
-    print(links)
-
     success, error_message = update_one('Files', {'_id': ObjectId(file_id)}, {'$set': {'links': links}})
 
     if not success:
-        return "Could not retrieve relevant links.", 400
+        return "Could not retrieve relevant links", 400
+    
+    videos = get_all_videos(summary_dict['keywords'])
+    success, error_message = update_one('Files', {'_id': ObjectId(file_id)}, {'$set': {'videos': videos}})
+
+    if not success:
+        return "Could not retrieve relevant videos", 400
 
     success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1, 'file_name': 1, 'gcs_link': 1, 'course': 1})
 
@@ -81,7 +84,7 @@ def create_embeddings():
     if not success:
         return error_message, 400
 
-    return  jsonify({'summary': summary_dict['summary'], 'links': links}), 200
+    return jsonify({'summary': summary_dict['summary'], 'links': links, 'videos': videos}), 200
 
 def chunk_elements(elements, file_id):
     chunks = []

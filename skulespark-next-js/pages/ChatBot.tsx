@@ -82,6 +82,7 @@ const Chatbot = ({ fileId }) => {
     };
     return (
         <div>
+            <h2>Chat:</h2>
             <input
                 type="text"
                 value={userInput}
@@ -90,6 +91,23 @@ const Chatbot = ({ fileId }) => {
                 style={{marginBottom: '10px'}}
             />
             <button onClick={handleUserSubmit}>Submit</button>
+            <div>
+            <input
+                type="radio"
+                id="current-note"
+                name="chat-type"
+                value="Current Note"
+            />
+            <label htmlFor="Current Note">Current Note</label>
+    
+            <input
+                type="radio"
+                id="whole-course"
+                name="chat-type"
+                value="Whole Course"
+            />
+            <label htmlFor="Whole Course">Whole Course</label>
+            </div>
 
             {/* Your chatbot UI using messages state */}
             {messages.map((message, index) => (

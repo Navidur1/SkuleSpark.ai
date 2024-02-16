@@ -72,11 +72,11 @@ def upload_pdf():
     return jsonify({'gcs_pdf_url': "fake"}), 400
 
 def ocr_flow(uploaded_file, file_id, skule_scrape = False):
-    url = "https://api.unstructured.io/general/v0/general"
+    url = "https://student-jk6a9w7w.api.unstructuredapp.io/general/v0/general"
 
     headers = {
         "accept": "application/json",
-        "unstructured-api-key": "XjLHeO7LAKW3FP8FYJvNIMPurrTQ0B",
+        "unstructured-api-key": "Sm6Y1c1fb34p2QeAqQmSSMtNRgqxFx",
     }
 
     data = {

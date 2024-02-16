@@ -64,7 +64,7 @@ def create_course():
 
 @crud_notes.route('/file_structure/<user_id>', methods=['GET'])
 def get_file_structure(user_id):
-    success, file_structure = get_data_one('Users', {'name': 'Dummy'}, {'courses': 1}) # Later on: {'_id': user_id}
+    success, file_structure = get_data_one('Users', {'name': 'Dummy'}, {'courses': 1})
 
     if not success:
         return "Could not fetch file structure", 400
@@ -72,4 +72,13 @@ def get_file_structure(user_id):
     data = file_structure['courses']
 
     return json.loads(json_util.dumps(data))
+
+@crud_notes.route('/note_data/<note_id>', methods=['GET'])
+def get_note_data(note_id):
+    success, note_data = get_data_one('Files', {'_id': ObjectId(note_id)}, {'summary': 1, 'links': 1, 'videos': 1, 'chat_ready': 1})
+
+    if not success:
+        return "Could not fetch note data", 400
+
+    return json.loads(json_util.dumps(note_data))
 
