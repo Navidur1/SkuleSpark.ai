@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Note } from './course_note';
+import './style/courseList.css';
 
 interface CourseListProps {
   onSelectCourse: (course: Course) => void;
@@ -41,12 +42,12 @@ const CourseList: React.FC<CourseListProps> = ({ onSelectCourse }) => {
   }, []);
 
   return (
-    <div>
+    <div className="courseListWrapper">
       <h2>Course List</h2>
-      <ul>
+      <ul className="courseList">
         {courses.map((course) => (
           <li key={course.course}>
-            <button onClick={() => onSelectCourse(course)}>{course.course}</button>
+            <button onClick={() => onSelectCourse(course)} className="courseButton">{course.course}</button>
           </li>
         ))}
       </ul>
