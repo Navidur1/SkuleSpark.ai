@@ -181,7 +181,10 @@ const SkuleSparkBody = ({fileStructure}) => {
     if (examData && Object.keys(examData).length > 0) {
       return (
         <div>
-          <h2>Recommended Exam Questions</h2>
+          <div>
+            <h2>Recommended Exam Questions</h2>
+          </div>
+          
           {Object.keys(examData).map((examId) => (
             <div key={examId} style={{ marginBottom: '20px' }}>
               <strong>Skule URL:</strong>
