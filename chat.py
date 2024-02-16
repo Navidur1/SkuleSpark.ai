@@ -118,8 +118,3 @@ def handle_chat_prompt():
         return jsonify(response_data)
     
 
-def generate_json_data():
-    # Your generator function logic here
-    for i in range(5):
-        yield json.dumps({"index": i}) + '\n'
-
