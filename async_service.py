@@ -2,6 +2,7 @@ import openai
 from flask import json
 import os
 from dotenv import load_dotenv, find_dotenv
+from webscrape import get_links
 
 # Set up open ai
 dotenv_path = find_dotenv(raise_error_if_not_found=True)
@@ -49,4 +50,19 @@ def create_summary(note_text):
 
     return result
 
+def get_all_links(search_terms, max_wikipedia):
+    all_links = []
+    wiki_count = 0
 
+    for term in search_terms:
+        links = get_links(term)
+        if links is not None:
+            for link in links:
+                if 'wikipedia' in link and wiki_count < max_wikipedia:
+                    all_links.append(link)
+                    wiki_count += 1
+                    break
+                elif 'wikipedia' not in link:
+                    all_links.append(link)
+                    break
+    return all_links
