@@ -163,38 +163,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     if (!chatReady) {
       return <div></div>;
     }
-    console.log("IN BODY" + fileId)
     return( <Chatbot fileId = {fileId}/>)
-    // return (
-    //   <div>
-    //     <h2>Chat with your recently updated Note:</h2>
-    //     <div style={{ display: 'flex' }}>
-    //       {/* Chat Input */}
-    //       <div style={{ flex: 1 }}>
-    //         <h2>Question</h2>
-    //         <input
-    //           type="text"
-    //           placeholder="Type your question..."
-    //           value={userInput}
-    //           onChange={(e) => setUserInput(e.target.value)}
-    //         />
-    //         <button onClick={updateChat}>Ask</button>
-    //       </div>
-
-    //       {/* Chat Output */}
-    //       <div style={{ flex: 1, textAlign: 'left' }}>
-    //         <h2>Answer</h2>
-    //         <MarkdownRenderer content={chatOutput} />
-    //         <h3>Sources: </h3>
-    //         {sources.map((source, index) => (
-    //           <div key={index}>
-    //             <p>{source}</p>
-    //           </div>
-    //         ))}
-    //       </div>
-    //     </div>
-    //   </div>
-    // );
   };
 
   const handleFileChange = (e) => {
