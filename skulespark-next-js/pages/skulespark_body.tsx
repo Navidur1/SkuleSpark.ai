@@ -159,7 +159,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   };
 
   const displayQuiz = () => {
-    if (examData) {
+    if (examData && Object.keys(examData).length > 0) {
       return (
         <div>
           <h2>Recommended Exam Questions</h2>
@@ -187,7 +187,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const getQuiz = async (note: Note) => {
 
     try{
-      const response = await fetch(`http://127.0.0.1:5000/generate-quiz/${note?._id.$oid}/${selectedCourse?.course}`, {
+      const response = await fetch(`http://127.0.0.1:5000/get-quiz/${note?._id.$oid}`, {
         method: 'GET',
       });
 

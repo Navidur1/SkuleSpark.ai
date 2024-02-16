@@ -5,7 +5,7 @@ from flask import Blueprint, request, json, jsonify
 from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv, find_dotenv
-
+from quiz_service import generate_quiz
 embedding_service = Blueprint('embedding_service', __name__)
 
 # Set up open ai 
@@ -56,7 +56,10 @@ def create_embeddings():
         success = pc_insert_one([pinecone_entry])
         if not success:
             return "Error"
-        
+    
+    # generate quiz
+    generate_quiz(file_id, course_code)
+
     success, error_message = update_one('Users', {'name': "Dummy", 'courses.course': course_code}, {'$push': {'courses.$.notes': {'_id': ObjectId(file_id), 'file_name': file_name, 'gcs_link': gcs_link}}})
 
     if not success:
