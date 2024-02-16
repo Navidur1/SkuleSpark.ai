@@ -8,6 +8,7 @@ import AugmentedNote from '../pages/AugmentedNote';
 import Chatbot from '../pages/ChatBot';
 import Modal from 'react-modal';
 import YouTube from 'react-youtube';
+import MarkdownRenderer from '../pages/MarkdownRenderer';
 
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
@@ -192,7 +193,7 @@ const SkuleSparkBody = ({fileStructure}) => {
               <strong style={{ marginTop: '10px', display: 'block' }}>Exam Questions:</strong>
               <ul style={{ marginLeft: '20px', listStyleType: 'disc' }}>
                 {examData[examId].exam_questions.map((question, index) => (
-                  <li key={index} style={{ marginBottom: '30px' }}>{question}</li>
+                  <li key={index} style={{ marginBottom: '30px' }} className="quizList"><MarkdownRenderer content={question} /></li>
                 ))}
               </ul>
             </div>
@@ -282,7 +283,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     return (
       <div>
         <h2>Check out these videos:</h2>
-        <ul>
+        <ul className="videoList">
           {videos.map((video_id, index) => (
             <li key={index}>
               <YouTube videoId={video_id} opts={opts} onReady={onReady}/>
@@ -416,7 +417,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             <CourseList key={courseListKey} onSelectCourse={handleSelectCourse} courses={courses} />
             <div>
               <button onClick={handleCreateCourse} className="createCourseButton">
-                Create Course
+                + Create Course
               </button>
             </div>
           </div>
@@ -425,7 +426,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             <div>
               {selectedCourse != null && (
                 <button onClick={handleUploadNote} className="uploadNoteButton">
-                  Upload Note
+                  + Upload Note
                 </button>
               )}
             </div>
@@ -480,7 +481,17 @@ const SkuleSparkBody = ({fileStructure}) => {
 
       {/* Popup for uploading a new note */}
       {showUploadNotePopup && selectedCourse != null && (
-        <Modal isOpen={modalIsOpen} onRequestClose={onCloseModal}>
+        <Modal isOpen={modalIsOpen} onRequestClose={onCloseModal}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
+          content: {
+            width: '50%', // Set the width of the modal
+            height: '50%', // Set the height of the modal
+            margin: 'auto', // Center the modal horizontally
+          },
+        }}>
         <h2>Upload Note</h2>
         <input type="file" onChange={handleFileChange} accept=".pdf" />
         <div>
