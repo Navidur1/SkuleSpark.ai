@@ -17,10 +17,9 @@ def get_video(keyword):
 
     response = request.execute()
 
-    URLs = []
+    ids = []
 
     for item in response['items']:
-        id = item['id']['videoId']
-        URLs.append(f"https://www.youtube.com/watch?v={id}")
+        ids.append(item['id']['videoId'])
 
-    return URLs
+    return ids

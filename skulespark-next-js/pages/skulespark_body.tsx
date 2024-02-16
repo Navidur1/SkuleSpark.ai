@@ -4,10 +4,10 @@ import Notebook from './icons/notebook.png';
 import Image from 'next/image';
 import CourseList, { Course, fetchCourses } from './course_list';
 import CourseNotes, { Note } from './course_note';
-import MarkdownRenderer from '../pages/MarkdownRenderer';
 import AugmentedNote from '../pages/AugmentedNote';
 import Chatbot from '../pages/ChatBot';
 import Modal from 'react-modal';
+import YouTube from 'react-youtube';
 
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
@@ -173,31 +173,6 @@ const SkuleSparkBody = ({fileStructure}) => {
     }
   };
 
-  const updateChat = async () => {
-    // TODO: Add logic to generate new chat output based on the user input
-    // For now, let's echo the user input
-    try{
-      const response = await fetch('http://127.0.0.1:5000/chat-prompt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ file_id: fileId, message: userInput }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setChatOutput(`SkuleSpark: ${data.answer}`);
-        setSources(data.sources)
-        setUserInput('');
-      
-      }
-    }
-    catch (error) {
-      console.error('Error during chat:', error);
-    }
-    
-  };
-
   const displayQuiz = () => {
     if (examData && Object.keys(examData).length > 0) {
       return (
@@ -292,15 +267,25 @@ const SkuleSparkBody = ({fileStructure}) => {
       return <div></div>
     }
 
+    const opts = {
+      height: '300',
+      width: '100%',
+      playerVars: {
+        autoplay: 0,
+      },
+    };
+
+    const onReady = (event) => {
+      event.target.pauseVideo();
+    };
+
     return (
       <div>
         <h2>Check out these videos:</h2>
         <ul>
-          {videos.map((video, index) => (
+          {videos.map((video_id, index) => (
             <li key={index}>
-              <a href={video} target="_blank" rel="noopener noreferrer">
-                {video}
-              </a>
+              <YouTube videoId={video_id} opts={opts} onReady={onReady}/>
             </li>
           ))}
         </ul>
