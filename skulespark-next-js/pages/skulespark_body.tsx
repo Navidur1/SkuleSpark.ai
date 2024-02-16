@@ -24,8 +24,6 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [chatReady, setChatReady] = useState(false);
   const [userInput, setUserInput] = useState('')
-  const [chatOutput, setChatOutput] = useState('')
-  const [sources, setSources] = useState([])
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfURL, setPdfURL] = useState('');
   const [ocrResult, setOCRResult] = useState([]);
@@ -38,10 +36,9 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [showUploadedNote, setShowUploadedNote] = useState(false);
   const [ocrComplete, setOCRComplete] = useState(false);
-  const [summaryReady, setSummaryReady] = useState(false);
-  const [linksReady, setLinksReady] = useState(false);
   const [summary, setSummary] = useState([]);
-  const [links, setLinks] = useState([])
+  const [links, setLinks] = useState([]);
+  const [videos, setVideos] = useState([]);
 
   const onCloseModal = () => {
     setModalIsOpen(false);
@@ -58,10 +55,34 @@ const SkuleSparkBody = ({fileStructure}) => {
 
   const handleSelectNote = (note: Note) => {
     setShowUploadedNote(false);
+    const fetchNoteData = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/note_data/${note._id.$oid}`, {
+          method: 'GET',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Update the file structure state
+          setSummary(data.summary);
+          setLinks(data.links);
+          setVideos(data.videos);
+          console.log("ajkhsdksa");
+          console.log(data);
+          setChatReady(data.chat_ready);
+        } else {
+          console.error('Failed to fetch note data');
+        }
+      } catch (error) {
+        console.error('Error fetching note data:', error);
+      }
+    };
+
+    fetchNoteData();
+
     setSelectedNote(note);
     getQuiz(note);
     setFileId(note._id.$oid)
-    setChatReady(true)
   };
 
   const handleCreateCourse = () => {
@@ -233,7 +254,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   };
 
   const displaySummary = () => {
-    if(!summaryReady){
+    if(summary == null || summary.length == 0){
       return(<div></div>)
     }
 
@@ -246,7 +267,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   }
 
   const displayLinks = () => {
-    if(!linksReady){
+    if(links == null || links.length == 0){
       return <div></div>
     }
 
@@ -258,6 +279,27 @@ const SkuleSparkBody = ({fileStructure}) => {
             <li key={index}>
               <a href={link} target="_blank" rel="noopener noreferrer">
                 {link}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const displayVideos = () => {
+    if(videos == null || videos.length == 0){
+      return <div></div>
+    }
+
+    return (
+      <div>
+        <h2>Check out these videos:</h2>
+        <ul>
+          {videos.map((video, index) => (
+            <li key={index}>
+              <a href={video} target="_blank" rel="noopener noreferrer">
+                {video}
               </a>
             </li>
           ))}
@@ -347,11 +389,9 @@ const SkuleSparkBody = ({fileStructure}) => {
         // Request was successful
         const data = await response.json();
 
-        setLinks(data.links);
         setSummary(data.summary);
-
-        setSummaryReady(true);
-        setLinksReady(true);
+        setLinks(data.links);
+        setVideos(data.videos);
         setChatReady(true);
         getAugmentedNotes();
         setShowUploadNotePopup(false);
@@ -433,9 +473,10 @@ const SkuleSparkBody = ({fileStructure}) => {
       <div className="column column3">
         {/*{displayAugmentedNotes()}*/}
         {displayChat()}
-        {displayQuiz()}
         {displaySummary()}
         {displayLinks()}
+        {displayVideos()}
+        {displayQuiz()}
       </div>
 
       {/* Popup for creating a new course */}

@@ -16,6 +16,9 @@ export interface Note {
   note_id: string;
   gcs_link: string;
   file_name: string;
+  summary: string;
+  links: string[];
+  videos: string[];
 }
 
 const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse, onSelectNote, fileStructure }) => {
