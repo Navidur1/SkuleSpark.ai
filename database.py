@@ -103,17 +103,27 @@ def insert_one(collection_name, data):
         return (False, e)
 
 
-def pc_get_many(message_embedding, file_id, top_k=5):
+def pc_get_many(message_embedding, file_id, top_k=5, include_values = False):
     
     filter = {"file_id": file_id}
     try:
-        query_result = pindex.query([message_embedding], top_k=top_k, include_metadata=True, filter=filter)
+        query_result = pindex.query([message_embedding], top_k=top_k, include_metadata=True, include_values= include_values, filter=filter)
         return (True, query_result)
 
     except Exception as e:
         print("An error occured during Pinecone query:", str(e))
         return (False, e)
+
+def pc_get_many_filter(message_embedding, filter=None, top_k=5, include_values = False):
     
+    try:
+        query_result = pindex.query([message_embedding], top_k=top_k, include_metadata=True, include_values= include_values, filter=filter)
+        return (True, query_result)
+
+    except Exception as e:
+        print("An error occured during Pinecone query:", str(e))
+        return (False, e)
+
 def pc_insert_one(data):
     try:
         pindex.upsert(data)

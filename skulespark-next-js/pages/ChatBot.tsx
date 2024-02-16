@@ -93,29 +93,29 @@ const Chatbot = ({ fileId }) => {
 
             {/* Your chatbot UI using messages state */}
             {messages.map((message, index) => (
-                <div key={index} style={{
-                    float: index % 2 === 0 ? 'right' : 'left',
-                    clear: 'both',
-                    margin: '10px 0', // Adjust the value (10px) as needed for top and bottom margin
-                    borderBottom: index % 2 === 0 ? 'none' : '2px solid',
-                }}>
-                    <p style={{width: index%2 === 0 ? 'auto' : '80%'}}> <MarkdownRenderer content={message[0]} /></p>
-                    {index % 2 !== 0 && (
-                        <button style = {{marginBottom: "15px"}} onClick={() => handleToggleSources(index)}>
-                            {isSourcesCollapsed[index] ? 'Expand Sources' : 'Collapse Sources'}
+                <div style={{display: "flex", justifyContent: index % 2 === 0 ? 'right' : 'left'}}>
+                    <div key={index} style={{
+                        margin: '10px 0', // Adjust the value (10px) as needed for top and bottom margin
+                        borderBottom: index % 2 === 0 ? 'none' : '2px solid'
+                    }}>
+                        <p style={{width: '80%', backgroundColor: index % 2 === 0 ? 'lightgreen' : 'lightblue', borderRadius: '10%', padding: '5px'}}> <MarkdownRenderer content={message[0]} /></p>
+                        {index % 2 !== 0 && (
+                            <button style = {{marginBottom: "15px"}} onClick={() => handleToggleSources(index)}>
+                                {isSourcesCollapsed[index] ?  'Collapse Sources' : 'Expand Sources'}
 
-                        </button>
-                    )}
-                    {!isSourcesCollapsed[index] && index % 2 !== 0 && (
-                        <>
-                            <h3>Sources: </h3>
-                            {message[1].map((source, sourceIndex) => (
-                                <div key={sourceIndex}>
-                                    <p>{source}</p>
-                                </div>
-                            ))}
-                        </>
-                    )}
+                            </button>
+                        )}
+                        {isSourcesCollapsed[index] && index % 2 !== 0 && (
+                            <>
+                                <h3>Sources: </h3>
+                                {message[1].map((source, sourceIndex) => (
+                                    <div key={sourceIndex}>
+                                        <p>{source}</p>
+                                    </div>
+                                ))}
+                            </>
+                        )}
+                    </div>
                 </div>
             ))}
 
