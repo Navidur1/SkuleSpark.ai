@@ -2,7 +2,7 @@ import pinecone
 import openai
 from database import insert_one, get_data_one, update_one, pc_get_many, pc_insert_one
 from flask import Blueprint, request, json, jsonify
-from async_service import create_summary
+from async_service import create_summary, get_all_links
 from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -44,6 +44,14 @@ def create_embeddings():
     if not success:
         return "Could not create summary/keywords.", 400
 
+    links = get_all_links(summary_dict['keywords'], 2)
+    print(links)
+
+    success, error_message = update_one('Files', {'_id': ObjectId(file_id)}, {'$set': {'links': links}})
+
+    if not success:
+        return "Could not retrieve relevant links.", 400
+
     success, data = get_data_one('Files', {'_id': ObjectId(file_id)}, {'chunk_ids': 1, 'file_name': 1, 'gcs_link': 1, 'course': 1})
 
     if not success:
@@ -70,7 +78,7 @@ def create_embeddings():
     if not success:
         return error_message, 400
 
-    return jsonify("Embed success"), 200
+    return  jsonify({'summary': summary_dict['summary'], 'links': links}), 200
 
 def chunk_elements(elements, file_id):
     chunks = []

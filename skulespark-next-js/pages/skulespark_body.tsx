@@ -6,7 +6,7 @@ import CourseList, { Course, fetchCourses } from './course_list';
 import CourseNotes, { Note } from './course_note';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
 import AugmentedNote from '../pages/AugmentedNote';
-
+import Modal from 'react-modal';
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
 }
@@ -32,7 +32,17 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [noteType, setNoteType] = useState(null)
   const [fileId, setFileId] = useState(null);
   const [noteListKey, setNoteListKey] = useState(0);
-  
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [showUploadedNote, setShowUploadedNote] = useState(false);
+  const [ocrComplete, setOCRComplete] = useState(false);
+  const [summaryReady, setSummaryReady] = useState(false);
+  const [linksReady, setLinksReady] = useState(false);
+  const [summary, setSummary] = useState([]);
+  const [links, setLinks] = useState([])
+
+  const onCloseModal = () => {
+    setModalIsOpen(false);
+  };
 
   const handleButtonClick = () => {
     setShowAdditionalColumns(!showAdditionalColumns);
@@ -44,6 +54,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   };
 
   const handleSelectNote = (note: Note) => {
+    setShowUploadedNote(false);
     setSelectedNote(note);
   };
 
@@ -58,6 +69,7 @@ const SkuleSparkBody = ({fileStructure}) => {
 
   const handleUploadNote = () => {
     setShowUploadNotePopup(true);
+    setModalIsOpen(true);
     handleUpload();
   }
 
@@ -89,6 +101,7 @@ const SkuleSparkBody = ({fileStructure}) => {
 
       // Increment the key to force re-render of CourseNotes
       setNoteListKey((prevKey) => prevKey + 1);
+      setOCRComplete(false);
 
     } catch (error) {
       console.error('Error uploading PDF:', error);
@@ -97,6 +110,7 @@ const SkuleSparkBody = ({fileStructure}) => {
 
   const handleCancelUploadNote = () => {
     setShowUploadNotePopup(false);
+    setModalIsOpen(false);
   };
   
 
@@ -194,6 +208,40 @@ const SkuleSparkBody = ({fileStructure}) => {
     );
   };
 
+  const displaySummary = () => {
+    if(!summaryReady){
+      return(<div></div>)
+    }
+
+    return(
+      <div>
+        <h2>Note Summary:</h2>
+        {summary}
+      </div>
+    )
+  }
+
+  const displayLinks = () => {
+    if(!linksReady){
+      return <div></div>
+    }
+
+    return (
+      <div>
+        <h2>Check out these links:</h2>
+        <ul>
+          {links.map((link, index) => (
+            <li key={index}>
+              <a href={link} target="_blank" rel="noopener noreferrer">
+                {link}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setPdfFile(selectedFile);
@@ -204,24 +252,27 @@ const SkuleSparkBody = ({fileStructure}) => {
       return <div></div>;
     }
 
-    return (
-      <div>
-        <h2>OCR Results:</h2>
-        <div style={{ overflowY: 'auto', maxHeight: '600px'}}>
-        {ocrResult.map((result, index) => (
-          <div style={{border: '1px solid', padding: "5px 5px"}}
-            key={index}
-            contentEditable="true"
-            ref={(element) => (elementRefs.current[index] = element)}
-            data-id={result['id']}
-          >
-            <p>{result['text']}</p>
+    if(ocrComplete == false)
+    {
+      return (
+        <div>
+          <h2>OCR Results:</h2>
+          <div style={{ overflowY: 'auto', maxHeight: '600px'}}>
+          {ocrResult.map((result, index) => (
+            <div style={{border: '1px solid', padding: "5px 5px"}}
+              key={index}
+              contentEditable="true"
+              ref={(element) => (elementRefs.current[index] = element)}
+              data-id={result['id']}
+            >
+              <p>{result['text']}</p>
+            </div>
+          ))}
           </div>
-        ))}
+          <button onClick={handleOCRConfirm}>Confirm OCR Results</button>
         </div>
-        <button onClick={handleOCRConfirm}>Confirm OCR Results</button>
-      </div>
-    );
+      );
+    }
   };
 
   const displayAugmentedNotes = () => {
@@ -271,8 +322,18 @@ const SkuleSparkBody = ({fileStructure}) => {
       if (response.ok) {
         // Request was successful
         const data = await response.json();
+
+        setLinks(data.links);
+        setSummary(data.summary);
+
+        setSummaryReady(true);
+        setLinksReady(true);
         setChatReady(true);
         getAugmentedNotes();
+        setShowUploadNotePopup(false);
+        setModalIsOpen(false);
+        setShowUploadedNote(true);
+        setOCRComplete(true);
       }
     }
     catch (error) {
@@ -323,7 +384,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         </>
       )}
       <div className={`column column2 ${showAdditionalColumns ? 'small' : ''}`}>
-        {selectedNote ? (
+        {(selectedNote != null) ? (
           <iframe
             src={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}&embedded=true`}
             title="pdf-viewer"
@@ -331,12 +392,25 @@ const SkuleSparkBody = ({fileStructure}) => {
             height="100%"
           />
         ) : (
-          'No note selected. Select a note to view PDF!'
+          <div></div>
+        )}
+
+        {(selectedNote == null && showUploadedNote == true) ? (
+          <iframe
+          src={`https://docs.google.com/viewer?url=${pdfURL}&embedded=true`}
+          title="pdf-viewer"
+          width="100%"
+          height="100%"
+        />
+        ) : (
+          <div></div>
         )}
       </div>
       <div className="column column3">
         {/*{displayAugmentedNotes()}*/}
         {displayChat()}
+        {displaySummary()}
+        {displayLinks()}
       </div>
 
       {/* Popup for creating a new course */}
@@ -355,23 +429,42 @@ const SkuleSparkBody = ({fileStructure}) => {
 
       {/* Popup for uploading a new note */}
       {showUploadNotePopup && selectedCourse != null && (
-        <div className="popup">
-          <input type="file" onChange={handleFileChange} accept=".pdf" />
-          <button onClick={handleCancelUploadNote}>Cancel</button>
-          <button onClick={handleUploadNote}>Confirm</button>
-          <div>
-            <input type="radio" id="typed" name="note-type" value="typed" onChange={handleNoteTypeChange}/>
-            <label for="typed">Typed</label>
-
-            <input type="radio" id="handwritten" name="note-type" value="handwritten" onChange={handleNoteTypeChange}/>
-            <label for="handwritten">Handwritten</label>
-
-            <input type="radio" id="both" name="note-type" value="both" onChange={handleNoteTypeChange}/>
-            <label for="both">Typed + Handwritten</label>
-          </div>
-          {displayOCRResult()}
+        <Modal isOpen={modalIsOpen} onRequestClose={onCloseModal}>
+        <h2>Upload Note</h2>
+        <input type="file" onChange={handleFileChange} accept=".pdf" />
+        <div>
+          <input
+            type="radio"
+            id="typed"
+            name="note-type"
+            value="typed"
+            onChange={handleNoteTypeChange}
+          />
+          <label htmlFor="typed">Typed</label>
+  
+          <input
+            type="radio"
+            id="handwritten"
+            name="note-type"
+            value="handwritten"
+            onChange={handleNoteTypeChange}
+          />
+          <label htmlFor="handwritten">Handwritten</label>
+  
+          <input
+            type="radio"
+            id="both"
+            name="note-type"
+            value="both"
+            onChange={handleNoteTypeChange}
+          />
+          <label htmlFor="both">Typed + Handwritten</label>
         </div>
-      )}
+        <button onClick={handleUpload}>Upload</button>
+        <button onClick={handleCancelUploadNote}>Cancel</button>
+        {displayOCRResult()}
+        </Modal>
+        )}  
     </div>
   );
 };
