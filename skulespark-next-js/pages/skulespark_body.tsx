@@ -4,11 +4,16 @@ import Notebook from './icons/notebook.png';
 import Image from 'next/image';
 import CourseList, { Course, fetchCourses } from './course_list';
 import CourseNotes, { Note } from './course_note';
-import MarkdownRenderer from '../pages/MarkdownRenderer';
 import AugmentedNote from '../pages/AugmentedNote';
 import Chatbot from '../pages/ChatBot';
 import Modal from 'react-modal';
+<<<<<<< HEAD
 import PdfViewer from '../pages/PdfViewer.tsx';
+=======
+import YouTube from 'react-youtube';
+import MarkdownRenderer from '../pages/MarkdownRenderer';
+
+>>>>>>> 24bf26d55fcea9f011a1f718fe3f43a7dd93b57a
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
 }
@@ -24,8 +29,6 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [chatReady, setChatReady] = useState(false);
   const [userInput, setUserInput] = useState('')
-  const [chatOutput, setChatOutput] = useState('')
-  const [sources, setSources] = useState([])
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfURL, setPdfURL] = useState('');
   const [ocrResult, setOCRResult] = useState([]);
@@ -34,13 +37,13 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [noteType, setNoteType] = useState(null)
   const [fileId, setFileId] = useState(null);
   const [noteListKey, setNoteListKey] = useState(0);
+  const [examData, setExamData] = useState({});
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [showUploadedNote, setShowUploadedNote] = useState(false);
   const [ocrComplete, setOCRComplete] = useState(false);
-  const [summaryReady, setSummaryReady] = useState(false);
-  const [linksReady, setLinksReady] = useState(false);
   const [summary, setSummary] = useState([]);
-  const [links, setLinks] = useState([])
+  const [links, setLinks] = useState([]);
+  const [videos, setVideos] = useState([]);
 
   const onCloseModal = () => {
     setModalIsOpen(false);
@@ -57,9 +60,34 @@ const SkuleSparkBody = ({fileStructure}) => {
 
   const handleSelectNote = (note: Note) => {
     setShowUploadedNote(false);
+    const fetchNoteData = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/note_data/${note._id.$oid}`, {
+          method: 'GET',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Update the file structure state
+          setSummary(data.summary);
+          setLinks(data.links);
+          setVideos(data.videos);
+          console.log("ajkhsdksa");
+          console.log(data);
+          setChatReady(data.chat_ready);
+        } else {
+          console.error('Failed to fetch note data');
+        }
+      } catch (error) {
+        console.error('Error fetching note data:', error);
+      }
+    };
+
+    fetchNoteData();
+
     setSelectedNote(note);
+    getQuiz(note);
     setFileId(note._id.$oid)
-    setChatReady(true)
   };
 
   const handleCreateCourse = () => {
@@ -150,30 +178,53 @@ const SkuleSparkBody = ({fileStructure}) => {
     }
   };
 
-  const updateChat = async () => {
-    // TODO: Add logic to generate new chat output based on the user input
-    // For now, let's echo the user input
+  const displayQuiz = () => {
+    if (examData && Object.keys(examData).length > 0) {
+      return (
+        <div>
+          <div>
+            <h2>Recommended Exam Questions</h2>
+          </div>
+          
+          {Object.keys(examData).map((examId) => (
+            <div key={examId} style={{ marginBottom: '20px' }}>
+              <strong>Skule URL:</strong>
+              <br />
+              <a href={examData[examId].exam_url} target="_blank" rel="noopener noreferrer">
+                {examData[examId].exam_url}
+              </a>
+              <br />
+              <strong style={{ marginTop: '10px', display: 'block' }}>Exam Questions:</strong>
+              <ul style={{ marginLeft: '20px', listStyleType: 'disc' }}>
+                {examData[examId].exam_questions.map((question, index) => (
+                  <li key={index} style={{ marginBottom: '30px' }} className="quizList"><MarkdownRenderer content={question} /></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      );
+    }
+  };
+
+  const getQuiz = async (note: Note) => {
+
     try{
-      const response = await fetch('http://127.0.0.1:5000/chat-prompt', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ file_id: fileId, message: userInput }),
+      const response = await fetch(`http://127.0.0.1:5000/get-quiz/${note?._id.$oid}`, {
+        method: 'GET',
       });
+
       if (response.ok) {
         const data = await response.json();
-        setChatOutput(`SkuleSpark: ${data.answer}`);
-        setSources(data.sources)
-        setUserInput('');
-      
+        setExamData(data)
       }
     }
     catch (error) {
-      console.error('Error during chat:', error);
+      console.error('Error during fetching augmented notes:', error);
     }
-    
-  };
+
+  }
+
 
   const displayChat = () => {
     if (!chatReady) {
@@ -183,7 +234,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   };
 
   const displaySummary = () => {
-    if(!summaryReady){
+    if(summary == null || summary.length == 0){
       return(<div></div>)
     }
 
@@ -196,7 +247,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   }
 
   const displayLinks = () => {
-    if(!linksReady){
+    if(links == null || links.length == 0){
       return <div></div>
     }
 
@@ -209,6 +260,37 @@ const SkuleSparkBody = ({fileStructure}) => {
               <a href={link} target="_blank" rel="noopener noreferrer">
                 {link}
               </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const displayVideos = () => {
+    if(videos == null || videos.length == 0){
+      return <div></div>
+    }
+
+    const opts = {
+      height: '300',
+      width: '100%',
+      playerVars: {
+        autoplay: 0,
+      },
+    };
+
+    const onReady = (event) => {
+      event.target.pauseVideo();
+    };
+
+    return (
+      <div>
+        <h2>Check out these videos:</h2>
+        <ul className="videoList">
+          {videos.map((video_id, index) => (
+            <li key={index}>
+              <YouTube videoId={video_id} opts={opts} onReady={onReady}/>
             </li>
           ))}
         </ul>
@@ -297,11 +379,9 @@ const SkuleSparkBody = ({fileStructure}) => {
         // Request was successful
         const data = await response.json();
 
-        setLinks(data.links);
         setSummary(data.summary);
-
-        setSummaryReady(true);
-        setLinksReady(true);
+        setLinks(data.links);
+        setVideos(data.videos);
         setChatReady(true);
         getAugmentedNotes();
         setShowUploadNotePopup(false);
@@ -341,7 +421,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             <CourseList key={courseListKey} onSelectCourse={handleSelectCourse} courses={courses} />
             <div>
               <button onClick={handleCreateCourse} className="createCourseButton">
-                Create Course
+                + Create Course
               </button>
             </div>
           </div>
@@ -350,7 +430,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             <div>
               {selectedCourse != null && (
                 <button onClick={handleUploadNote} className="uploadNoteButton">
-                  Upload Note
+                  + Upload Note
                 </button>
               )}
             </div>
@@ -388,6 +468,8 @@ const SkuleSparkBody = ({fileStructure}) => {
         {displayChat()}
         {displaySummary()}
         {displayLinks()}
+        {displayVideos()}
+        {displayQuiz()}
       </div>
 
       {/* Popup for creating a new course */}
@@ -406,7 +488,17 @@ const SkuleSparkBody = ({fileStructure}) => {
 
       {/* Popup for uploading a new note */}
       {showUploadNotePopup && selectedCourse != null && (
-        <Modal isOpen={modalIsOpen} onRequestClose={onCloseModal}>
+        <Modal isOpen={modalIsOpen} onRequestClose={onCloseModal}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
+          content: {
+            width: '50%', // Set the width of the modal
+            height: '50%', // Set the height of the modal
+            margin: 'auto', // Center the modal horizontally
+          },
+        }}>
         <h2>Upload Note</h2>
         <input type="file" onChange={handleFileChange} accept=".pdf" />
         <div>

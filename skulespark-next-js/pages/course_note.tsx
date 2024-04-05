@@ -16,20 +16,23 @@ export interface Note {
   note_id: string;
   gcs_link: string;
   file_name: string;
+  summary: string;
+  links: string[];
+  videos: string[];
 }
 
 const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse, onSelectNote, fileStructure }) => {
   return (
-    <div>
+    <div className="courseListWrapper">
       <h2>Notes for {selectedCourse ? selectedCourse.course : 'No course selected'}</h2>
-      <ul>
+      <ul className="courseList">
         {selectedCourse &&
           fileStructure
             .filter((course) => course.course === selectedCourse.course)
             .map((course) =>
               course.notes.map((note) => (
                 <li key={note.note_id}>
-                  <button onClick={() => onSelectNote(note)}>{note.file_name}</button>
+                  <button onClick={() => onSelectNote(note)} className="courseButton">{note.file_name}</button>
                 </li>
               ))
             )}

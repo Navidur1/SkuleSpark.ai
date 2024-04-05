@@ -1,8 +1,10 @@
 import openai
 from flask import json
 import os
+import time
 from dotenv import load_dotenv, find_dotenv
 from webscrape import get_links
+from youtube import get_video
 
 # Set up open ai
 dotenv_path = find_dotenv(raise_error_if_not_found=True)
@@ -51,11 +53,15 @@ def create_summary(note_text):
     return result
 
 def get_all_links(search_terms, max_wikipedia):
+    if len(search_terms) > 3:
+        search_terms = search_terms[:3]
+
     all_links = []
     wiki_count = 0
 
     for term in search_terms:
         links = get_links(term)
+        time.sleep(0.5)
         if links is not None:
             for link in links:
                 if 'wikipedia' in link and wiki_count < max_wikipedia:
@@ -65,4 +71,21 @@ def get_all_links(search_terms, max_wikipedia):
                 elif 'wikipedia' not in link:
                     all_links.append(link)
                     break
+                    
+    print(all_links)
     return all_links
+
+def get_all_videos(search_terms):
+    if len(search_terms) > 3:
+        search_terms = search_terms[:3]
+        
+    all_videos = []
+
+    for term in search_terms:
+        video = get_video(term)
+        time.sleep(0.5)
+        if video is not None:
+            all_videos.append(video)
+
+    print(all_videos)
+    return all_videos

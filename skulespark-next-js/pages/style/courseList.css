@@ -1,0 +1,56 @@
+.courseList{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+ul.courseList li{
+    margin: 0;
+    padding: 0;
+}
+
+.courseButton{
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    background-color: white;
+    border: none;
+}
+
+.courseButton:hover{
+    cursor: pointer;
+    background-color: #E1DFDD;
+}
+
+.createCourseButton{
+    height: 30px;
+    width: 100%;
+    background-color: #112a9a;
+    color: white;
+    border-color: white;
+}
+
+.createCourseButton:hover{
+    cursor: pointer;
+    background-color: white;
+    color: #112a9a;
+    transition: background-color 0.3s ease;
+    border-color: #112a9a;
+}
+
+.uploadNoteButton{
+    height: 30px;
+    width: 100%;
+    background-color: #112a9a;
+    color: white;
+    border-color: white;
+}
+
+.uploadNoteButton:hover{
+    cursor: pointer;
+    background-color: white;
+    color: #112a9a;
+    transition: background-color 0.3s ease;
+    border-color: #112a9a;
+}

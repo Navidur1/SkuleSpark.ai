@@ -1,16 +1,12 @@
 import requests
-#from goose3 import Goose
 
 #Skulespark@gmail.com key
 API_KEY = "AIzaSyAPvQ4rM3utD22oHlY7a8kuhtlQ6bBtTPc"
 CX = "378336830fc104cdf"
-NUM_RESULTS = 2
+NUM_RESULTS = 3
 
 # Returns a list of links of length NUM_RESULTS
-def get_links(search_term):
-    #used for text extraction from website
-    #g = Goose()
-
+def get_links(search_term):        
     ret = []
     url = f"https://www.googleapis.com/customsearch/v1?key={API_KEY}&cx={CX}&q={search_term}&num={NUM_RESULTS}"
 
@@ -26,18 +22,9 @@ def get_links(search_term):
             website_response = requests.get(link)
 
             if website_response.status_code == 200:
-                #Find and extract the text content using goose3
-                # article = g.extract(link)
-                # main_text = article.cleaned_text
-
                 ret.append(link)
 
-            else:
-                '''return "Request website reponse failed with status code {website_response.status_code}\n"'''
-                return None
-
     else:
-        '''return "Request failed with status code {response.status_code}"'''
         return None
     
     return ret

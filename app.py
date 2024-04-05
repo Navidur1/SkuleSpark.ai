@@ -8,13 +8,14 @@ from ocr_flow import ocr_service
 from embedding_service import embedding_service
 from crud_notes import crud_notes
 from database import get_data
+from quiz_service import quiz_service
 
 app = Flask(__name__)
 app.register_blueprint(chat_service)
 app.register_blueprint(ocr_service)
 app.register_blueprint(embedding_service)
 app.register_blueprint(crud_notes)
-
+app.register_blueprint(quiz_service)
 CORS(app)
 
 
