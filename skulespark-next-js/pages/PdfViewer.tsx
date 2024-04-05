@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import ReactDOM from "react-dom";
+
 import { pdfjs, Document, Page } from "react-pdf";
+import 'react-pdf/dist/Page/TextLayer.css';
 
 
-import samplePDF from "./Ismail_Bennani_Resume (6).pdf";
-
-
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 function PdfViewer({ pdfLink }) {
   const canvas = useRef();
@@ -22,6 +21,9 @@ function PdfViewer({ pdfLink }) {
 
     var context = canvas.current.getContext("2d");
     var { width, height } = canvas.current;
+    var actualW = 1700;
+    var actualH = 2200;
+    var scaleFactor = width/actualW 
     console.log(width, height);
     context.save();
 
@@ -35,26 +37,31 @@ function PdfViewer({ pdfLink }) {
     // context.fillText("Acme Inc", 0, 0);
     // Draw a bounding rectangle
     // Example usage:
-    const points = [
-      [565.6666564941406, 92.31832611111106], // Top-left
-      [565.6666564941406, 161.17138166666663], // Bottom-left
-      [1136.3333740234375, 161.17138166666663], // Bottom-right
-      [1136.3333740234375, 92.31832611111106], // Top-right
+    const points1 = [
+      [130, 424], // Top-left
+      [130, 492], // Bottom-left
+      [514, 492], // Bottom-right
+      [514, 424], // Top-right
     ];
-
+    const points = [
+        [144, 496], // Top-left
+        [144, 562], // Bottom-left
+        [1576, 562], // Bottom-right
+        [1576, 496], // Top-right
+      ];
     // Calculate rectangle width and height
     const w = points[2][0] - points[0][0];
     const h = points[1][1] - points[0][1];
     context.strokeStyle = "red";
     context.lineWidth = 5;
     //context.strokeRect(points[0][0], points[0][1], w, h); // Example coordinates and dimensions
-    context.strokeRect(1700, 496, 600, h);
+    context.strokeRect(points[0][0] *scaleFactor, points[0][1]*scaleFactor, w*scaleFactor, h*scaleFactor);
     context.restore();
   }, [isRendered]);
 
   return (
     //<div style={{ width: "100%", height: "auto" }}>
-    <Document file={pdfLink}>
+    <Document file={"https://cdn.filestackcontent.com/wcrjf9qPTCKXV3hMXDwK"}>
       <Page
         pageNumber={1}
         canvasRef={canvas}

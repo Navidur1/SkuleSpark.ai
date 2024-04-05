@@ -434,17 +434,18 @@ const SkuleSparkBody = ({fileStructure}) => {
           </div>
         </>
       )}
+      
       <div className={`column column2 ${showAdditionalColumns ? 'small' : ''}`}>
         {(selectedNote != null) ? (
           <div>
-            <PdfViewer link = {`https://docs.google.com/viewer?url=${selectedNote.gcs_link}`} />
+            <PdfViewer pdfLink ={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}`} />
             <iframe
               src={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}&embedded=true`}
               title="pdf-viewer"
               width="100%"
               height="100%"
             />
-          <div/>
+          </div>
         ) : (
           <div></div>
         )}
