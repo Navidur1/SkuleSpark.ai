@@ -8,7 +8,7 @@ import MarkdownRenderer from '../pages/MarkdownRenderer';
 import AugmentedNote from '../pages/AugmentedNote';
 import Chatbot from '../pages/ChatBot';
 import Modal from 'react-modal';
-
+import PdfViewer from '../pages/PdfViewer.tsx';
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
 }
@@ -359,12 +359,15 @@ const SkuleSparkBody = ({fileStructure}) => {
       )}
       <div className={`column column2 ${showAdditionalColumns ? 'small' : ''}`}>
         {(selectedNote != null) ? (
-          <iframe
-            src={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}&embedded=true`}
-            title="pdf-viewer"
-            width="100%"
-            height="100%"
-          />
+          <div>
+            <PdfViewer link = {`https://docs.google.com/viewer?url=${selectedNote.gcs_link}`} />
+            <iframe
+              src={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}&embedded=true`}
+              title="pdf-viewer"
+              width="100%"
+              height="100%"
+            />
+          <div/>
         ) : (
           <div></div>
         )}
