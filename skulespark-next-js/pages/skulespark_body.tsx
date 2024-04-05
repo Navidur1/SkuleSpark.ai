@@ -7,13 +7,10 @@ import CourseNotes, { Note } from './course_note';
 import AugmentedNote from '../pages/AugmentedNote';
 import Chatbot from '../pages/ChatBot';
 import Modal from 'react-modal';
-<<<<<<< HEAD
 import PdfViewer from '../pages/PdfViewer.tsx';
-=======
 import YouTube from 'react-youtube';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
 
->>>>>>> 24bf26d55fcea9f011a1f718fe3f43a7dd93b57a
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
 }
