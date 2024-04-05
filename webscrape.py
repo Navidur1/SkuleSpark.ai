@@ -1,5 +1,5 @@
 import requests
-from goose3 import Goose
+#from goose3 import Goose
 
 #Skulespark@gmail.com key
 API_KEY = "AIzaSyAPvQ4rM3utD22oHlY7a8kuhtlQ6bBtTPc"
