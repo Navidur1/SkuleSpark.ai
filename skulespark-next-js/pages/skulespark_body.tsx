@@ -41,7 +41,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [summary, setSummary] = useState([]);
   const [links, setLinks] = useState([]);
   const [videos, setVideos] = useState([]);
-
+  const [sourcesHighlight, setSourcesHighlight] = useState([])
   const onCloseModal = () => {
     setModalIsOpen(false);
   };
@@ -227,7 +227,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     if (!chatReady) {
       return <div></div>;
     }
-    return( <Chatbot fileId = {fileId}/>)
+    return( <Chatbot fileId = {fileId} highlight = {sourcesHighlight}/>)
   };
 
   const displaySummary = () => {
@@ -438,7 +438,7 @@ const SkuleSparkBody = ({fileStructure}) => {
       <div className={`column column2 ${showAdditionalColumns ? 'small' : ''}`}>
         {(selectedNote != null) ? (
           <div>
-            <PdfViewer pdfLink ={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}`} />
+            <PdfViewer pdfLink ={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}` highlight = {sourcesHighlight}} />
             <iframe
               src={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}&embedded=true`}
               title="pdf-viewer"
@@ -451,12 +451,15 @@ const SkuleSparkBody = ({fileStructure}) => {
         )}
 
         {(selectedNote == null && showUploadedNote == true) ? (
+          <div>
+            <PdfViewer pdfLink ={`https://docs.google.com/viewer?url=${pdfURL}`} />
           <iframe
           src={`https://docs.google.com/viewer?url=${pdfURL}&embedded=true`}
           title="pdf-viewer"
           width="100%"
           height="100%"
         />
+        </div>
         ) : (
           <div></div>
         )}

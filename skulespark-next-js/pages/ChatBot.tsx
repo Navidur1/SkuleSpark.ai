@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
-const Chatbot = ({ fileId }) => {
+const Chatbot = ({ fileId, highlight}) => {
     const [userInput, setUserInput] = useState('');
     const [messages, setMessages] = useState([]);
     // Define a state to track the collapse/expand status for each message
@@ -128,7 +128,7 @@ const Chatbot = ({ fileId }) => {
                                 <h3>Sources: </h3>
                                 {message[1].map((source, sourceIndex) => (
                                     <div key={sourceIndex}>
-                                        <p>{source}</p>
+                                        <p>{source["text"]}</p>
                                     </div>
                                 ))}
                             </>

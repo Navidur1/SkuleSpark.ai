@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { pdfjs, Document, Page } from "react-pdf";
 import 'react-pdf/dist/Page/TextLayer.css';
-
+import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
-function PdfViewer({ pdfLink }) {
+function PdfViewer({ pdfLink, highlight}) {
   const canvas = useRef();
   const [isRendered, setIsRendered] = useState();
 
@@ -56,12 +56,13 @@ function PdfViewer({ pdfLink }) {
     context.lineWidth = 5;
     //context.strokeRect(points[0][0], points[0][1], w, h); // Example coordinates and dimensions
     context.strokeRect(points[0][0] *scaleFactor, points[0][1]*scaleFactor, w*scaleFactor, h*scaleFactor);
+    context.strokeRect(points[0][0]*scaleFactor +500, points[0][1]*scaleFactor+100, w*scaleFactor, h*scaleFactor);
     context.restore();
   }, [isRendered]);
 
   return (
     //<div style={{ width: "100%", height: "auto" }}>
-    <Document file={"https://cdn.filestackcontent.com/wcrjf9qPTCKXV3hMXDwK"}>
+    <Document file={"https://storage.googleapis.com/capstone-notes-bucket/Arafat_Resume (3).pdf"}>
       <Page
         pageNumber={1}
         canvasRef={canvas}
