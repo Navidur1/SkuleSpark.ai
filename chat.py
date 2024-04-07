@@ -98,6 +98,44 @@ def get_gpt_response(augmented_message,sources,streaming):
 
     else:       
         return response.choices[0].message.content
+# Make sure the sources have all of the original text, this is very important!
+
+def prune_relevant_sources(user_msg, sources):
+    message = "Given this question from a user: \n" + user_msg
+    message += "\nWhich of the sources below might help answer the question. From these sources"
+    message += " identify the ones that are relevant to the question and can support and answer the users questions. Return a json boolean array called relevant_sources which marks if a source is relevant (true) or not (false)"
+    message += "\nSources:\n"
+
+    for index, text in enumerate(sources):
+        message += "\nSource " + str(index + 1) + ": \n"
+        message += text;
+    
+
+    message += "make the output of the relevant_sources array in this format. For example:"
+    message += "say source 1 is relevant, source 2 is not relevant, source 3 is relevant then output would be [true, false, true]. Sources that are relevant are marked true and irrelvant sources are marked false"
+    messages = [{
+                    "role": "system",
+                    "content": "You specialize in identifying relevant sources from a given list that is relevant and can help answer a given question. You return the identified relevant sources in a json boolean array called relevant_sources."
+                },{
+                    "role": "user",
+                    "content": message
+                }]
+
+    response = client.chat.completions.create(
+        model = model_id,
+        messages = messages,
+        stream=False,
+        response_format={"type": "json_object"}
+    )
+    print(response.choices[0].message.content)
+
+    pruned_sources = json.loads(response.choices[0].message.content)
+    res = []
+    for index, is_relevant in enumerate(pruned_sources['relevant_sources']):
+        if (is_relevant):
+            res.append(sources[index])
+    return res
+
 
 @chat_service.route('/chat-prompt', methods=['POST'])
 def handle_chat_prompt():
@@ -109,6 +147,7 @@ def handle_chat_prompt():
     streaming = True
 
     sources = get_relevant_sources(user_message_orig,file_id,whole_course,course_code)
+    #pruned_sources = prune_relevant_sources(user_message_orig, sources)
     augmented_message = get_augmented_message(user_message_orig,sources)
     chatgpt_response = get_gpt_response(augmented_message,sources,streaming)
     
