@@ -37,7 +37,7 @@ def get_relevant_sources(message, file_id):
     MAX_TOKENS = 1100
     tokens = 0
     context = []
-
+    
     for match in query_results['matches']:
         success, chunk= get_data_one('Chunks', { '_id': ObjectId(match['id'])})
         print(chunk)
@@ -50,8 +50,23 @@ def get_relevant_sources(message, file_id):
         if tokens > MAX_TOKENS:
             break
 
-        context.append(text)
+        
+        
+        elements = []  # List to store elements for the current chunk
 
+        for element_id in chunk['element_ids']:
+            success, element_data = get_data_one('Elements', {'_id': ObjectId(element_id)})
+            if success:
+                element_info = {
+                    'coordinates': element_data['metadata']['coordinates']['points'],
+                    'width': element_data['metadata']['coordinates']['layout_width'],
+                    'height': element_data['metadata']['coordinates']['layout_height'],
+                    'page_number': element_data['metadata']['page_number']
+                }
+                elements.append(element_info)
+        
+        context.append({"text": text, "elements":elements, "gcsLink": "https://storage.googleapis.com/capstone-notes-bucket/Arafat_Resume (3).pdf" })
+    
     return context
 
 def get_augmented_message(message, sources):
@@ -59,7 +74,7 @@ def get_augmented_message(message, sources):
     augmented_message = source_introduction
     source_text = ""
     for i,source in enumerate(sources):
-        source_text += f"{i}. {source} \n\n"
+        source_text += f"{i}. {source['text']} \n\n"
     if(source_text==""):
         source_text = "N/A\n\n"
     augmented_message += source_text
