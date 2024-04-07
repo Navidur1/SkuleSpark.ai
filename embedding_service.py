@@ -71,7 +71,7 @@ def create_embeddings():
 
         text_to_embed = data['text']
         embedding_res = client.embeddings.create(input=text_to_embed, model=embedding_model)
-        pinecone_entry = (str(chunk_id), embedding_res.data[0].embedding, {"file_id": file_id})
+        pinecone_entry = (str(chunk_id), embedding_res.data[0].embedding, {"file_id": file_id, "course_code_user_notes": course_code})
         success = pc_insert_one([pinecone_entry])
         if not success:
             return "Error"

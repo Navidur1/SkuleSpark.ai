@@ -188,7 +188,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     const isSectionActive = (sectionName) => activeSection.includes(sectionName);
 
     const renderModule = (sectionName, content) => (
-      <div key={sectionName} style={{ marginBottom: '10px' }}>
+      <div key={sectionName} style={{ marginBottom: '5px', marginTop: '5px' }}>
         <button onClick={() => toggleSection(sectionName)} className={`aiFeatureModules ${isSectionActive(sectionName) ? '' : 'collapsed'}`}>{sectionName}</button>
         {isSectionActive(sectionName) && <div>{content}</div>}
       </div>
@@ -264,7 +264,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     if (!chatReady) {
       return <div></div>;
     }
-    return( <Chatbot fileId = {fileId}/>)
+    return( <Chatbot fileId = {fileId} courseCode={selectedCourse}/>)
   };
 
   const displaySummary = () => {

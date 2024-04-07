@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
-const Chatbot = ({ fileId }) => {
+const Chatbot = ({ fileId, courseCode }) => {
     const [userInput, setUserInput] = useState('');
     const [messages, setMessages] = useState([]);
     // Define a state to track the collapse/expand status for each message
     const [isSourcesCollapsed, setIsSourcesCollapsed] = useState({});
+    const [chatType, setChatType] = useState('Current Note'); // State to store the selected chat type
+
+    const handleRadioChange = (event) => {
+      setChatType(event.target.value); // Update the state with the selected value
+    };
+
 
     const handleUserInput = async () => {
         try {
@@ -13,7 +19,7 @@ const Chatbot = ({ fileId }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ file_id: fileId, message: userInput }),
+                body: JSON.stringify({ file_id: fileId, message: userInput, whole_course: chatType === 'Whole Course' ? true : false, course_code:  courseCode.course}),
             });
 
             if (response.ok) {
@@ -92,21 +98,27 @@ const Chatbot = ({ fileId }) => {
             />
             <button onClick={handleUserSubmit}>Submit</button>
             <div>
-            <input
-                type="radio"
-                id="current-note"
-                name="chat-type"
-                value="Current Note"
-            />
-            <label htmlFor="Current Note">Current Note</label>
-    
-            <input
-                type="radio"
-                id="whole-course"
-                name="chat-type"
-                value="Whole Course"
-            />
-            <label htmlFor="Whole Course">Whole Course</label>
+                <input
+                    type="radio"
+                    id="current-note"
+                    name="chat-type"
+                    value="Current Note"
+                    checked={chatType === 'Current Note'} // Check if this radio button is selected
+                    onChange={handleRadioChange}
+                />
+                <label htmlFor="Current Note">Current Note</label>
+
+                <input
+                    type="radio"
+                    id="whole-course"
+                    name="chat-type"
+                    value="Whole Course"
+                    checked={chatType === 'Whole Course'} // Check if this radio button is selected
+                    onChange={handleRadioChange}
+                />
+                <label htmlFor="Whole Course">Whole Course</label>
+
+                {/* <p>Selected Chat Type: {chatType}</p> Display the selected value */}
             </div>
 
             {/* Your chatbot UI using messages state */}

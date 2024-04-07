@@ -6,7 +6,7 @@ import json
 import os
 import tiktoken
 from dotenv import load_dotenv,find_dotenv
-from database import pc_get_many, get_data_one
+from database import pc_get_many, get_data_one, pc_get_many_filter
 import time
 
 # Set up open ai 
@@ -28,9 +28,16 @@ def num_tokens_from_string(string: str):
     return num_tokens
 
 
-def get_relevant_sources(message, file_id):
+def get_relevant_sources(message, file_id, whole_course, course_code):
     message_embedding = client.embeddings.create(input=message, model=embedding_model).data[0].embedding
-    success, query_results = pc_get_many(message_embedding,file_id)
+    filter = {}
+
+    if (whole_course):
+        filter = {'course_code_user_notes': course_code}
+    else:
+        filter = {'file_id': file_id}
+
+    success, query_results = pc_get_many_filter(message_embedding = message_embedding, filter = filter)
     if not success:
         return ""
 
@@ -97,9 +104,11 @@ def handle_chat_prompt():
     req_body = request.json
     user_message_orig = req_body['message']
     file_id = req_body['file_id']
+    whole_course = req_body['whole_course']
+    course_code = req_body['course_code']
     streaming = True
 
-    sources = get_relevant_sources(user_message_orig,file_id)
+    sources = get_relevant_sources(user_message_orig,file_id,whole_course,course_code)
     augmented_message = get_augmented_message(user_message_orig,sources)
     chatgpt_response = get_gpt_response(augmented_message,sources,streaming)
     
