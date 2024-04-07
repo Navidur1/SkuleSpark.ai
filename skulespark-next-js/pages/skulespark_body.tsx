@@ -7,6 +7,7 @@ import CourseNotes, { Note } from './course_note';
 import AugmentedNote from '../pages/AugmentedNote';
 import Chatbot from '../pages/ChatBot';
 import Modal from 'react-modal';
+import PdfViewer from '../pages/PdfViewer.tsx';
 import YouTube from 'react-youtube';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
 
@@ -41,7 +42,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [links, setLinks] = useState([]);
   const [videos, setVideos] = useState([]);
   const [activeSection, setActiveSection] = useState([]);
-
+  const [sourcesHighlight, setSourcesHighlight] = useState([])
   const onCloseModal = () => {
     setModalIsOpen(false);
   };
@@ -81,12 +82,18 @@ const SkuleSparkBody = ({fileStructure}) => {
     };
 
     fetchNoteData();
-
+    setSourcesHighlight([])
     setSelectedNote(note);
+    setPdfURL(note.gcs_link);
     getQuiz(note);
     setFileId(note._id.$oid)
   };
-
+  const updatePdfURL = newValue => {
+    setPdfURL(newValue);
+  }
+  const updateSourcesHighlight = newValue => {
+    setSourcesHighlight(newValue);
+  };
   const handleCreateCourse = () => {
     setShowCreateCoursePopup(true);
   };
@@ -264,7 +271,8 @@ const SkuleSparkBody = ({fileStructure}) => {
     if (!chatReady) {
       return <div></div>;
     }
-    return( <Chatbot fileId = {fileId} courseCode={selectedCourse}/>)
+
+    return( <Chatbot fileId = {fileId} courseCode={selectedCourse} updateHighlight = {updateSourcesHighlight} updatePDFLink={updatePdfURL} PDFLink={pdfURL}/>)
   };
 
   const displaySummary = () => {
@@ -420,6 +428,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         getAugmentedNotes();
         setShowUploadNotePopup(false);
         setModalIsOpen(false);
+        setSourcesHighlight([]);
         setShowUploadedNote(true);
         setOCRComplete(true);
       }
@@ -471,25 +480,26 @@ const SkuleSparkBody = ({fileStructure}) => {
           </div>
         </>
       )}
+      
       <div className={`column column2 ${showAdditionalColumns ? 'small' : ''}`}>
         {(selectedNote != null) ? (
-          <iframe
-            src={`https://docs.google.com/viewer?url=${selectedNote.gcs_link}&embedded=true`}
-            title="pdf-viewer"
-            width="100%"
-            height="100%"
-          />
+          <>
+            <PdfViewer pdfLink ={`${pdfURL}`} highlight = {sourcesHighlight} />
+          </>
         ) : (
           <div></div>
         )}
 
         {(selectedNote == null && showUploadedNote == true) ? (
+          <>
+            <PdfViewer pdfLink ={`${pdfURL}`} highlight={sourcesHighlight} />
           <iframe
           src={`https://docs.google.com/viewer?url=${pdfURL}&embedded=true`}
           title="pdf-viewer"
           width="100%"
           height="100%"
         />
+        </>
         ) : (
           <div></div>
         )}
