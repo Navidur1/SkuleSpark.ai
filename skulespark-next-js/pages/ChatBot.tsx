@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
-const Chatbot = ({ fileId, highlight}) => {
+const Chatbot = ({ fileId, updateHighlight, updatePDFLink, PDFLink}) => {
     const [userInput, setUserInput] = useState('');
     const [messages, setMessages] = useState([]);
     // Define a state to track the collapse/expand status for each message
@@ -80,6 +80,15 @@ const Chatbot = ({ fileId, highlight}) => {
             [index]: !prev[index],
         }));
     };
+
+    const linkToSource = (source) => {
+        if (source["gcsLink"]!== PDFLink){
+            //add gcs link to chat.py getrelevant sources
+            //updatePDFLink(source["gcsLink"]);
+        }
+        
+        updateHighlight(source["elements"]);
+    }
     return (
         <div>
             <h2>Chat:</h2>
@@ -128,7 +137,7 @@ const Chatbot = ({ fileId, highlight}) => {
                                 <h3>Sources: </h3>
                                 {message[1].map((source, sourceIndex) => (
                                     <div key={sourceIndex}>
-                                        <p>{source["text"]}</p>
+                                        <p onClick={() => linkToSource(source)}>{source["text"]}</p>
                                     </div>
                                 ))}
                             </>

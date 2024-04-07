@@ -65,7 +65,7 @@ def get_relevant_sources(message, file_id):
                 }
                 elements.append(element_info)
         
-        context.append({"text": text, "elements":elements})
+        context.append({"text": text, "elements":elements, "gcsLink": "https://storage.googleapis.com/capstone-notes-bucket/Arafat_Resume (3).pdf" })
     
     return context
 
