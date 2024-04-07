@@ -15,14 +15,24 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink})
 
 
     const handleUserInput = async () => {
-        try {
+        try {               
+            // Extracting the last four messages and their sources
+            // const history = messages.slice(-4, -1).map(([msg, sources]) => ({
+              
+            //     message: msg,
+            //     sources: sources.map(source => source.text)
+            // }));
+            const history = messages.slice(-4).map(([msg]) => msg);
+            //console.log("HISTORY", messages)
+            //const history = messages.length >= 5 ? messages.slice(-4).map(([msg]) => msg) : messages.slice(0).map(([msg]) => msg);
             const response = await fetch('http://127.0.0.1:5000/chat-prompt', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ file_id: fileId, message: userInput, whole_course: chatType === 'Whole Course' ? true : false, course_code:  courseCode.course}),
+                body: JSON.stringify({ file_id: fileId, message: userInput, whole_course: chatType === 'Whole Course' ? true : false, course_code:  courseCode.course, history: history}),
             });
+ 
 
             if (response.ok) {
                 const reader = response.body.getReader();
@@ -76,7 +86,7 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink})
     const handleUserSubmit = () => {
         // Do something with the user input if needed
         console.log('User Input:', userInput);
-        setMessages(prevMessages => [...prevMessages, [userInput, [""]]]);
+        setMessages(prevMessages => [...prevMessages, [userInput, [{}]]]);
         // Fetch data based on user input
         handleUserInput();
     };

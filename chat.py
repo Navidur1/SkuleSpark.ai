@@ -97,16 +97,23 @@ def get_augmented_message(message, sources):
 
     return augmented_message
 
-def get_gpt_response(augmented_message,sources,streaming):
+def get_gpt_response(augmented_message,sources,streaming,history):
+    print("history:" ,history)
     messages = [{
                     "role": "system", 
                     "content": "You are a helpful tutor that specializes in answering student questions. Consider the provided context while formulating your answer. If the context is not relevant let the student know"
-                },
-                {
+                }
+                ]
+    for i in range(len(history)):
+        role = "user"
+        if i%2 == 1:
+            role = "assistant"
+        messages.append({"role":role, "content":history[i]})
+
+    messages.append( {
                     "role": "user",
                     "content": augmented_message
-                }]
-
+                })
     response = client.chat.completions.create(
         model = model_id,
         messages = messages,
@@ -116,7 +123,7 @@ def get_gpt_response(augmented_message,sources,streaming):
         for chunk in response:
             if chunk.choices[0].delta.content:
                 yield json.dumps({ "type": "answer", "data":chunk.choices[0].delta.content})
-        print("sources", sources)
+        #print("sources", sources)
         yield json.dumps({"type": "reference", "data": sources})
 
     else:       
@@ -167,12 +174,13 @@ def handle_chat_prompt():
     file_id = req_body['file_id']
     whole_course = req_body['whole_course']
     course_code = req_body['course_code']
+    history = req_body['history']
     streaming = True
 
     sources = get_relevant_sources(user_message_orig,file_id,whole_course,course_code)
     #pruned_sources = prune_relevant_sources(user_message_orig, sources)
     augmented_message = get_augmented_message(user_message_orig,sources)
-    chatgpt_response = get_gpt_response(augmented_message,sources,streaming)
+    chatgpt_response = get_gpt_response(augmented_message,sources,streaming,history)
     
     def response_wrapper():
         for response in chatgpt_response:
