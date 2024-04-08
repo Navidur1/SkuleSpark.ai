@@ -63,16 +63,23 @@ def get_all_links(search_terms, max_wikipedia):
         links = get_links(term)
         time.sleep(0.5)
         if links is not None:
-            for link in links:
-                if 'wikipedia' in link and wiki_count < max_wikipedia:
-                    all_links.append(link)
-                    wiki_count += 1
+            found_wikipedia = False
+            for link_data in links:
+                link = link_data["link"]
+                if 'wikipedia' in link:
+                    if wiki_count < max_wikipedia:
+                        all_links.append(link_data)
+                        wiki_count += 1
+                        found_wikipedia = True
+                        break
+                else:
+                    all_links.append(link_data)
+                    found_wikipedia = True
                     break
-                elif 'wikipedia' not in link:
-                    all_links.append(link)
-                    break
-                    
-    print(all_links)
+            if not found_wikipedia:
+                all_links.extend(links)
+
+    print("Webscrape results:", all_links)
     return all_links
 
 def get_all_videos(search_terms):
