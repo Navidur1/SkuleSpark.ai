@@ -102,6 +102,8 @@ def ocr_flow(uploaded_file, file_id, skule_scrape = False, note_type = "typed"):
     elements_response = []
 
     # Store elements in mongoDB
+    curr_page = []
+    page_number = 1
     for ind, data in enumerate(json_response):
         data["file_id"] = file_id
         data["element_index"] = ind
@@ -115,9 +117,21 @@ def ocr_flow(uploaded_file, file_id, skule_scrape = False, note_type = "typed"):
         obj = {
             'id': str(_id),
             'text': data['text'],
+            "page_number": data["metadata"]["page_number"],
+            "coordinates": data["metadata"]["coordinates"]["points"],
+            "width": data['metadata']['coordinates']['layout_width'],
         }
 
-        elements_response.append(obj)
+        #send data organized by page number
+        if(obj["page_number"]!= page_number):
+            elements_response.append(curr_page)
+            page_number+=1
+            curr_page = []
         
+        curr_page.append(obj)
+    
+    if (len(curr_page)):
+        elements_response.append(curr_page)
+
     return success, elements_response
 

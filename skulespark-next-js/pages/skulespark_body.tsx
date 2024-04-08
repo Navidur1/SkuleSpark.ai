@@ -10,7 +10,7 @@ import Modal from 'react-modal';
 import PdfViewer from '../pages/PdfViewer.tsx';
 import YouTube from 'react-youtube';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
-
+import OCRViewer from '../pages/OCRViewer.tsx';
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
 }
@@ -43,7 +43,11 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [videos, setVideos] = useState([]);
   const [activeSection, setActiveSection] = useState([]);
   const [sourcesHighlight, setSourcesHighlight] = useState([])
-
+  const [hideOCROptions, setHideOCROptions] = useState(true)
+  const [pageNumber, setPageNumber] = useState(1); // Initialize page number state
+  const [confirmedResults, setConfirmedResults] = useState([]);
+  const [coordOCR, setCoordOCR] = useState([]);
+  const [OCRW, setOCRW] = useState(0);
   const onCloseModal = () => {
     setModalIsOpen(false);
   };
@@ -107,6 +111,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const handleUploadNote = () => {
     setShowUploadNotePopup(true);
     setModalIsOpen(true);
+    setHideOCROptions(false);
     // handleUpload();
   }
 
@@ -140,7 +145,12 @@ const SkuleSparkBody = ({fileStructure}) => {
       // Increment the key to force re-render of CourseNotes
       setNoteListKey((prevKey) => prevKey + 1);
       setOCRComplete(false);
+      setHideOCROptions(true);
+      setPageNumber(1);
 
+      //iterate over data results and store in confirmedResults
+      const results = data.ocr_result.map(page => page.map(element => ({"id": element["id"], "text": element["text"]})));
+      setConfirmedResults(results);
     } catch (error) {
       console.error('Error uploading PDF:', error);
     }
@@ -349,31 +359,92 @@ const SkuleSparkBody = ({fileStructure}) => {
     const selectedFile = e.target.files[0];
     setPdfFile(selectedFile);
   };
+  // Function to handle next page button click
+  const handleNextPage = () => {
+    if(pageNumber<ocrResult.length){
+      //updateCurrentPage(pageNumber);
+      setPageNumber(prevPageNumber => prevPageNumber + 1);
+    }
+    
+  };
+  // Function to handle previous page button click
+  const handlePreviousPage = () => {
+    if (pageNumber > 1) {
+      //updateCurrentPage(pageNumber);
+      setPageNumber(prevPageNumber => prevPageNumber - 1);
+    }
+  };
+  const updateCurrentPage = (currPage) => {
+    const updatedElements = elementRefs.current.map((ref) => {
+      if (ref) {
+        return {
+          id: ref.dataset.id,
+          text: ref.innerText,
+        };
+      }
+    });
+    setConfirmedResults(prevResults => {
+      const newResults = [...prevResults]; // Create a copy of the current state
+      newResults[currPage-1] = updatedElements; // Replace the array at the specified page number
+      return newResults; // Update the state with the new array
+    });
+    console.log("UPDATED", confirmedResults);
+  }
 
+  // Function to handle text edit
+  const handleTextChange = (index, text) => {
+    setConfirmedResults(prevResults => {
+      const newResults = [...prevResults]; // Create a copy of the current state
+      newResults[pageNumber-1][index]["text"] = text; // Replace the array at the specified page number
+      return newResults; // Update the state with the new array
+    });
+    console.log("UPDATED", confirmedResults);
+    };
+    const handleMouseEnter = (index) => {
+      setCoordOCR(ocrResult[pageNumber-1][index]["coordinates"]);
+      setOCRW(ocrResult[pageNumber-1][index]["width"]);
+    };
   const displayOCRResult = () => {
     if (ocrResult.length == 0) {
       return <div></div>;
     }
-
+    console.log("OCR", ocrResult);
     if(ocrComplete == false)
     {
       return (
-        <div>
-          <h2>OCR Results:</h2>
-          <div style={{ overflowY: 'auto', maxHeight: '600px'}}>
-          {ocrResult.map((result, index) => (
-            <div style={{border: '1px solid', padding: "5px 5px"}}
-              key={index}
-              contentEditable="true"
-              ref={(element) => (elementRefs.current[index] = element)}
-              data-id={result['id']}
-            >
-              <p>{result['text']}</p>
+        <>
+        <div style={{ display: 'flex', justifyContent: 'space-between'}}>
+          <div style={{ flex: '1', marginRight: '20px' }}> 
+            <h2>OCR Results:</h2>
+            <div style={{ overflowY: 'auto', maxHeight: "100%",width:"100%"}}>
+            {/* {confirmedResults[pageNumber-1].map((result, index) => (
+              <div style={{border: '1px solid', padding: "5px 5px"}}
+                key={index}
+                contentEditable="true"
+                ref={(element) => (elementRefs.current[index] = element)}
+                data-id={result['id']}
+              >
+                <p>{result['text']}</p>
+              </div>
+            ))} */}
+            {confirmedResults[pageNumber - 1]?.map((result, index) => (
+              <div style={{border: '1px solid', padding: "5px 5px"}} key={index} onClick={() => handleMouseEnter(index)}>
+                <p contentEditable="true" onBlur={(e) => handleTextChange(index, e.target.innerText)}>{result["text"]}</p>
+              </div>
+            ))}
             </div>
-          ))}
+            <button style={{backgroundColor: "green"}} onClick={handleOCRConfirm}>Confirm OCR Results</button>
           </div>
-          <button onClick={handleOCRConfirm}>Confirm OCR Results</button>
+          <div style={{width:"50%"}}>
+            <OCRViewer pdfLink={pdfURL} highlight = {coordOCR} pageNumber = {pageNumber} actualW={OCRW} />
+          </div>
         </div>
+        <div style={{ marginTop: '10px' }}>
+          <button onClick={handlePreviousPage}>Previous</button>
+          <span style={{ margin: '0 10px' }}>{pageNumber}</span> {/* Display current page number */}
+          <button onClick={handleNextPage}>Next</button>
+        </div>
+        </>
       );
     }
   };
@@ -406,21 +477,14 @@ const SkuleSparkBody = ({fileStructure}) => {
   const handleOCRConfirm = async () => {
     // Send confirmation to embedding service
     try{
-      const updatedElements = elementRefs.current.map((ref) => {
-        if (ref) {
-          return {
-            id: ref.dataset.id,
-            text: ref.innerText,
-          };
-        }
-      });
-
+      //updateCurrentPage(pageNumber);
+      console.log("CONFIRMED", confirmedResults);
       const response = await fetch('http://127.0.0.1:5000/confirm_results', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Set the content type to JSON
         },
-        body: JSON.stringify({file_id: fileId , confirmed_elements: updatedElements}),
+        body: JSON.stringify({file_id: fileId , confirmed_elements: [].concat(...confirmedResults)}),
       });
       if (response.ok) {
         // Request was successful
@@ -542,43 +606,46 @@ const SkuleSparkBody = ({fileStructure}) => {
             zIndex: 999,
           },
           content: {
-            width: '50%', // Set the width of the modal
-            height: '50%', // Set the height of the modal
+            width: '80%', // Set the width of the modal
+            height: '100%', // Set the height of the modal
             margin: 'auto', // Center the modal horizontally
           }, 
         }}>
-        <h2>Upload Note</h2>
-        <input type="file" onChange={handleFileChange} accept=".pdf" />
+          {!hideOCROptions && (
         <div>
-          <input
-            type="radio"
-            id="typed"
-            name="note-type"
-            value="typed"
-            onChange={handleNoteTypeChange}
-          />
-          <label htmlFor="typed">Typed</label>
-  
-          <input
-            type="radio"
-            id="handwritten"
-            name="note-type"
-            value="handwritten"
-            onChange={handleNoteTypeChange}
-          />
-          <label htmlFor="handwritten">Handwritten</label>
-  
-          <input
-            type="radio"
-            id="both"
-            name="note-type"
-            value="both"
-            onChange={handleNoteTypeChange}
-          />
-          <label htmlFor="both">Typed + Handwritten</label>
-        </div>
-        <button onClick={handleUpload}>Upload</button>
-        <button onClick={handleCancelUploadNote}>Cancel</button>
+          <h2>Upload Note</h2>
+          <input type="file" onChange={handleFileChange} accept=".pdf" />
+          <div>
+            <input
+              type="radio"
+              id="typed"
+              name="note-type"
+              value="typed"
+              onChange={handleNoteTypeChange}
+            />
+            <label htmlFor="typed">Typed</label>
+    
+            <input
+              type="radio"
+              id="handwritten"
+              name="note-type"
+              value="handwritten"
+              onChange={handleNoteTypeChange}
+            />
+            <label htmlFor="handwritten">Handwritten</label>
+    
+            <input
+              type="radio"
+              id="both"
+              name="note-type"
+              value="both"
+              onChange={handleNoteTypeChange}
+            />
+            <label htmlFor="both">Typed + Handwritten</label>
+          </div>
+          <button onClick={handleUpload}>Upload</button>
+          <button onClick={handleCancelUploadNote}>Cancel</button>
+        </div> )}
         {displayOCRResult()}
         </Modal>
         )}  
