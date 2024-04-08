@@ -67,7 +67,7 @@ def upload_pdf():
     
     # Return the GCS URL of the uploaded PDF file
     if success:
-        return jsonify({'gcs_pdf_url': gcs_pdf_url, 'file_id': str(file_id), 'ocr_result': ocr_results}), 200
+        return jsonify({'gcs_pdf_url': gcs_pdf_url, 'file_id': str(file_id), 'ocr_result': ocr_results, 'file_name': pdf_file.filename}), 200
     
     return jsonify({'gcs_pdf_url': "fake"}), 400
 

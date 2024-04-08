@@ -133,12 +133,27 @@ const SkuleSparkBody = ({fileStructure}) => {
       });
 
       const data = await response.json();
+      // Update the courses state with the new note data
+      const updatedCourses = courses.map((course) => {
+        if (course.course === selectedCourse?.course) {
+          return {
+            ...course,
+            notes: [...course.notes, {
+              _id: { $oid: data.file_id }, // Assuming data.file_id contains the new note's ID
+              file_name: data.file_name, // Assuming data.file_name contains the new note's file name
+              gcs_link: data.gcs_pdf_url, // Assuming data.gcs_pdf_url contains the new note's GCS link
+            }]
+          };
+        }
+        return course;
+      });
+
+      // Set the updatedCourses state
+      setCourses(updatedCourses);
+
       setPdfURL(data.gcs_pdf_url);
       setOCRResult(data.ocr_result);
       setFileId(data.file_id);
-
-      // Increment the key to force re-render of CourseNotes
-      setNoteListKey((prevKey) => prevKey + 1);
       setOCRComplete(false);
 
     } catch (error) {
@@ -474,7 +489,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             </div>
           </div>
           <div className={`column ${showAdditionalColumns ? 'small' : ''}`}>
-            <CourseNotes key={noteListKey} selectedCourse={selectedCourse} onSelectNote={handleSelectNote} fileStructure={fileStructure} />
+            <CourseNotes key={noteListKey} selectedCourse={selectedCourse} onSelectNote={handleSelectNote} fileStructure={courses} />
             <div>
               {selectedCourse != null && (
                 <button onClick={handleUploadNote} className="uploadNoteButton">
