@@ -20,7 +20,7 @@ function OCRViewer({ pdfLink, highlight, pageNumber, actualW}) {
     setIsRendered(true);
        // Update key to force re-render of Document component when documentUrl changes
     //setKey(prevKey => prevKey + 1);
-    if(isRendered){
+    if(isRendered && highlight.length>0){
         var context = canvas.current.getContext('2d');
         var { width, height } = canvas.current;
         var scaleFactor = width/actualW 
@@ -73,13 +73,13 @@ function OCRViewer({ pdfLink, highlight, pageNumber, actualW}) {
     setKey(prevKey => prevKey + 1);
   }, [highlight]);
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div style={{ width: "100%", height: "auto" }}>
     <Document key= {key} file={pdfLink}>
     <Page
         pageNumber={pageNumber}
         canvasRef={canvas}
         onRenderSuccess={onRenderSuccess}
-        //width={containerWidth ? Math.min(containerWidth, maxWidth) : width*0.5}
+        width={width? Math.min(width*0.4, maxWidth) : width*0.5}
       />
           
     </Document>

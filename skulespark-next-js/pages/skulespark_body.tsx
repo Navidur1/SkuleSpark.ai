@@ -363,6 +363,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const handleNextPage = () => {
     if(pageNumber<ocrResult.length){
       //updateCurrentPage(pageNumber);
+      setCoordOCR([])
       setPageNumber(prevPageNumber => prevPageNumber + 1);
     }
     
@@ -371,6 +372,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const handlePreviousPage = () => {
     if (pageNumber > 1) {
       //updateCurrentPage(pageNumber);
+      setCoordOCR([]);
       setPageNumber(prevPageNumber => prevPageNumber - 1);
     }
   };
@@ -416,7 +418,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         <div style={{ display: 'flex', justifyContent: 'space-between'}}>
           <div style={{ flex: '1', marginRight: '20px' }}> 
             <h2>OCR Results:</h2>
-            <div style={{ overflowY: 'auto', maxHeight: "100%",width:"100%"}}>
+            <div style={{ overflowY: 'auto', maxHeight: "80%",width:"100%"}}>
             {/* {confirmedResults[pageNumber-1].map((result, index) => (
               <div style={{border: '1px solid', padding: "5px 5px"}}
                 key={index}
@@ -433,17 +435,18 @@ const SkuleSparkBody = ({fileStructure}) => {
               </div>
             ))}
             </div>
-            <button style={{backgroundColor: "green"}} onClick={handleOCRConfirm}>Confirm OCR Results</button>
+            <button style={{backgroundColor: "green", marginTop:"5px"}} onClick={handleOCRConfirm}>Confirm OCR Results</button>
           </div>
           <div style={{width:"50%"}}>
-            <OCRViewer pdfLink={pdfURL} highlight = {coordOCR} pageNumber = {pageNumber} actualW={OCRW} />
+            <OCRViewer pdfLink={pdfURL} highlight = {coordOCR} pageNumber = {pageNumber} actualW={OCRW} /> 
+            <div style={{ marginTop: '5px' }}>
+              <button onClick={handlePreviousPage}>Previous</button>
+              <span style={{ margin: '0 10px' }}>{pageNumber}</span> {/* Display current page number */}
+              <button onClick={handleNextPage}>Next</button>
+            </div>
           </div>
         </div>
-        <div style={{ marginTop: '10px' }}>
-          <button onClick={handlePreviousPage}>Previous</button>
-          <span style={{ margin: '0 10px' }}>{pageNumber}</span> {/* Display current page number */}
-          <button onClick={handleNextPage}>Next</button>
-        </div>
+       
         </>
       );
     }
@@ -607,7 +610,7 @@ const SkuleSparkBody = ({fileStructure}) => {
           },
           content: {
             width: '80%', // Set the width of the modal
-            height: '100%', // Set the height of the modal
+            height: '90%', // Set the height of the modal
             margin: 'auto', // Center the modal horizontally
           }, 
         }}>
