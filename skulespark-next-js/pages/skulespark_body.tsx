@@ -519,18 +519,29 @@ const SkuleSparkBody = ({fileStructure}) => {
         {featureDropDown()}
       </div>
 
-      {/* Popup for creating a new course */}
+      {/* Modal for creating a new course */}
       {showCreateCoursePopup && (
-        <div className="popup">
+        <Modal isOpen={true} onRequestClose={() => setShowCreateCoursePopup(false)}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          },
+          content: {
+            width: '50%', // Set the width of the modal
+            height: '50%', // Set the height of the modal
+            margin: 'auto', // Center the modal horizontally
+          },
+        }}>
+          <h2>Create Course</h2>
           <input
             type="text"
             placeholder="Enter course name"
             value={newCourseName}
             onChange={(e) => setNewCourseName(e.target.value)}
           />
-          <button onClick={handleCancelCreateCourse}>Cancel</button>
-          <button onClick={handleConfirmCreateCourse}>Confirm</button>
-        </div>
+          <button onClick={() => setShowCreateCoursePopup(false)}>Cancel</button>
+          <button onClick={handleConfirmCreateCourse}>Create</button>
+        </Modal>
       )}
 
       {/* Popup for uploading a new note */}
