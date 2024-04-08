@@ -25,7 +25,7 @@ def get_augmented_message(exam):
 
     augmented_message = f"Exam text:\n\n"
     augmented_message += exam
-    augmented_message += f"\n\nTry your best to retrieve all the text from the exam questions and put it into an array named exam_questions. This array is an array of strings that holds the all of the text of each question in the exam. Also always add html formatting to the questions so it is formatted nicely."
+    augmented_message += f"\n\nTry your best to retrieve all the text from the exam questions and put it into an array named exam_questions. This array is an array of strings that holds the all of the text of each question in the exam. Also always add html formatting (such as paragraph, header, and table tags) to the questions so it is formatted nicely."
 
     return augmented_message
 

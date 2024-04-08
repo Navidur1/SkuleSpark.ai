@@ -123,3 +123,45 @@
   .aiFeatureModules.collapsed::after {
     content: '+';
   }
+
+.link_master_wrapper{
+    padding: 10px;
+}
+.link_wrapper{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border: 1px solid black;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.link_wrapper:hover{
+    background-color: lightgray;
+}
+
+.link_favicon_wrapper{
+    margin-right: 8px;
+}
+
+.link_favicon_wrapper img {
+    width: 30px;
+    height: 30px;
+  }
+
+.link_title_wrapper a
+{
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: black;
+    text-decoration: none;
+}
+
+.link_title_wrapper a:visited {
+    color: black; 
+  }
