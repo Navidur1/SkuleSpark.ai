@@ -289,22 +289,25 @@ const SkuleSparkBody = ({fileStructure}) => {
   }
 
   const displayLinks = () => {
-    if(links == null || links.length == 0){
-      return <div></div>
+    if (links == null || Object.keys(links).length === 0) {
+      return <div></div>;
     }
-
+  
     return (
-      <div>
+      <div className="link_master_wrapper">
         <h2>Check out these links:</h2>
-        <ul>
-          {links.map((link, index) => (
-            <li key={index}>
-              <a href={link} target="_blank" rel="noopener noreferrer">
-                {link}
+        {Object.keys(links).map((term, index) => (
+          <div key={index} className="link_wrapper" onClick={() => window.open(links[term].link, "_blank")}>
+            <div className="link_favicon_wrapper">
+              <img src={links[term].favicon_url || "https://www.google.com/favicon.ico"} alt="Favicon" />
+            </div>
+            <div className="link_title_wrapper">
+              <a href={links[term].link} target="_blank" rel="noopener noreferrer">
+                {links[term].title}
               </a>
-            </li>
-          ))}
-        </ul>
+            </div>
+          </div>
+        ))}
       </div>
     );
   };
