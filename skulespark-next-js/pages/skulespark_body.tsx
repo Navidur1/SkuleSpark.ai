@@ -525,6 +525,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         style={{
           overlay: {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
           },
           content: {
             width: '50%', // Set the width of the modal
