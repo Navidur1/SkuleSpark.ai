@@ -21,7 +21,7 @@ export interface Note {
   videos: string[];
 }
 
-const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse, onSelectNote, fileStructure }) => {
+const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse, onSelectNote, fileStructure, selectedNote }) => {
   return (
     <div className="courseListWrapper">
       <h2>Notes for {selectedCourse ? selectedCourse.course : 'No course selected'}</h2>
@@ -32,7 +32,12 @@ const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse, onSelectNote,
             .map((course) =>
               course.notes.map((note) => (
                 <li key={note.note_id}>
-                  <button onClick={() => onSelectNote(note)} className="courseButton">{note.file_name}</button>
+                  <button
+                    onClick={() => onSelectNote(note)}
+                    className={selectedNote?._id === note._id ? 'selectedNoteButton' : 'courseButton'}
+                  >
+                    {note.file_name}
+                  </button>
                 </li>
               ))
             )}
