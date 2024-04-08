@@ -33,7 +33,7 @@ def upload_pdf():
         return 'No "course" provided', 400
     
     course = data['course']
-
+    note_type = data['note_type']
     # TO DO:
     # Use note_type to use different models
     
@@ -63,7 +63,7 @@ def upload_pdf():
     if not success:
         return "Could not save file", 400
 
-    success, ocr_results = ocr_flow(pdf_file, file_id)
+    success, ocr_results = ocr_flow(pdf_file, file_id, note_type=note_type)
     
     # Return the GCS URL of the uploaded PDF file
     if success:
@@ -71,19 +71,26 @@ def upload_pdf():
     
     return jsonify({'gcs_pdf_url': "fake"}), 400
 
-def ocr_flow(uploaded_file, file_id, skule_scrape = False):
+def ocr_flow(uploaded_file, file_id, skule_scrape = False, note_type = "typed"):
     url = "https://student-jk6a9w7w.api.unstructuredapp.io/general/v0/general"
 
     headers = {
         "accept": "application/json",
         "unstructured-api-key": "Sm6Y1c1fb34p2QeAqQmSSMtNRgqxFx",
     }
-
-    data = {
-        "strategy": "hi_res",
-        "coordinates": "true"
-    }
-
+    data = {}
+    print(note_type)
+    if note_type == "typed":
+        data = {
+            "strategy": "hi_res",
+            "coordinates": "true",
+        }
+    else:
+        data = {
+            "strategy": "ocr_only",
+            "coordinates": "true",
+        }
+       
     file_content = uploaded_file.read()
     file_in_mem = BytesIO(file_content)
     file_data = {'files': (uploaded_file.filename, file_in_mem)}
@@ -92,7 +99,6 @@ def ocr_flow(uploaded_file, file_id, skule_scrape = False):
 
     file_in_mem.close()
     json_response = response.json()
-    
     elements_response = []
 
     # Store elements in mongoDB

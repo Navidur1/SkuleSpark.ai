@@ -43,6 +43,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [videos, setVideos] = useState([]);
   const [activeSection, setActiveSection] = useState([]);
   const [sourcesHighlight, setSourcesHighlight] = useState([])
+
   const onCloseModal = () => {
     setModalIsOpen(false);
   };
@@ -106,7 +107,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const handleUploadNote = () => {
     setShowUploadNotePopup(true);
     setModalIsOpen(true);
-    handleUpload();
+    // handleUpload();
   }
 
   const handleNoteTypeChange = (e) => {
@@ -116,7 +117,8 @@ const SkuleSparkBody = ({fileStructure}) => {
   const handleUpload = async () => {
     try {
       if(noteType == null){
-        return // Should indicate some sort of alert to the user
+        window.alert('Please select a note type');
+        return; // Should indicate some sort of alert to the user
       }
       
       const formData = new FormData();
@@ -496,12 +498,12 @@ const SkuleSparkBody = ({fileStructure}) => {
         {(selectedNote == null && showUploadedNote == true) ? (
           <>
             <PdfViewer pdfLink ={`${pdfURL}`} highlight={sourcesHighlight} />
-          <iframe
+          {/* <iframe
           src={`https://docs.google.com/viewer?url=${pdfURL}&embedded=true`}
           title="pdf-viewer"
           width="100%"
           height="100%"
-        />
+        /> */}
         </>
         ) : (
           <div></div>
