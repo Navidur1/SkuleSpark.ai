@@ -29,7 +29,7 @@ export const fetchCourses = async (): Promise<Course[]> => {
   }
 };
 
-const CourseList: React.FC<CourseListProps> = ({ onSelectCourse }) => {
+const CourseList: React.FC<CourseListProps> = ({ onSelectCourse, selectedCourse }) => {
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
@@ -47,7 +47,12 @@ const CourseList: React.FC<CourseListProps> = ({ onSelectCourse }) => {
       <ul className="courseList">
         {courses.map((course) => (
           <li key={course.course}>
-            <button onClick={() => onSelectCourse(course)} className="courseButton">{course.course}</button>
+            <button
+              onClick={() => onSelectCourse(course)}
+              className={selectedCourse?.course === course.course ? 'selectedCourseButton' : 'courseButton'}
+            >
+              {course.course}
+            </button>
           </li>
         ))}
       </ul>

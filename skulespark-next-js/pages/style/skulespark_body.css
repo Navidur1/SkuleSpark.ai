@@ -164,4 +164,8 @@
 
 .link_title_wrapper a:visited {
     color: black; 
-  }
+}
+
+.selected-item {
+    background-color: lightgray;
+}

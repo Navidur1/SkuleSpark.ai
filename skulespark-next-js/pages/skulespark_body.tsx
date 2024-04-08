@@ -548,7 +548,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         <>
           <div className={`column ${showAdditionalColumns ? 'small' : ''}`}>
             {/* Use key attribute to force re-render of CourseList */}
-            <CourseList key={courseListKey} onSelectCourse={handleSelectCourse} courses={courses} />
+            <CourseList key={courseListKey} onSelectCourse={handleSelectCourse} selectedCourse={selectedCourse} courses={courses} />
             <div>
               <button onClick={handleCreateCourse} className="createCourseButton">
                 + Create Course
@@ -556,7 +556,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             </div>
           </div>
           <div className={`column ${showAdditionalColumns ? 'small' : ''}`}>
-            <CourseNotes key={noteListKey} selectedCourse={selectedCourse} onSelectNote={handleSelectNote} fileStructure={courses} />
+            <CourseNotes key={noteListKey} selectedCourse={selectedCourse} onSelectNote={handleSelectNote} fileStructure={courses} selectedNote={selectedNote}/>
             <div>
               {selectedCourse != null && (
                 <button onClick={handleUploadNote} className="uploadNoteButton">
