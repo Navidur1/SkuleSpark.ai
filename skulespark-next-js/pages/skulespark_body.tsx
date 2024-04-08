@@ -133,12 +133,27 @@ const SkuleSparkBody = ({fileStructure}) => {
       });
 
       const data = await response.json();
+      // Update the courses state with the new note data
+      const updatedCourses = courses.map((course) => {
+        if (course.course === selectedCourse?.course) {
+          return {
+            ...course,
+            notes: [...course.notes, {
+              _id: { $oid: data.file_id }, // Assuming data.file_id contains the new note's ID
+              file_name: data.file_name, // Assuming data.file_name contains the new note's file name
+              gcs_link: data.gcs_pdf_url, // Assuming data.gcs_pdf_url contains the new note's GCS link
+            }]
+          };
+        }
+        return course;
+      });
+
+      // Set the updatedCourses state
+      setCourses(updatedCourses);
+
       setPdfURL(data.gcs_pdf_url);
       setOCRResult(data.ocr_result);
       setFileId(data.file_id);
-
-      // Increment the key to force re-render of CourseNotes
-      setNoteListKey((prevKey) => prevKey + 1);
       setOCRComplete(false);
 
     } catch (error) {
@@ -474,7 +489,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             </div>
           </div>
           <div className={`column ${showAdditionalColumns ? 'small' : ''}`}>
-            <CourseNotes key={noteListKey} selectedCourse={selectedCourse} onSelectNote={handleSelectNote} fileStructure={fileStructure} />
+            <CourseNotes key={noteListKey} selectedCourse={selectedCourse} onSelectNote={handleSelectNote} fileStructure={courses} />
             <div>
               {selectedCourse != null && (
                 <button onClick={handleUploadNote} className="uploadNoteButton">
@@ -519,18 +534,30 @@ const SkuleSparkBody = ({fileStructure}) => {
         {featureDropDown()}
       </div>
 
-      {/* Popup for creating a new course */}
+      {/* Modal for creating a new course */}
       {showCreateCoursePopup && (
-        <div className="popup">
+        <Modal isOpen={true} onRequestClose={() => setShowCreateCoursePopup(false)}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
+          },
+          content: {
+            width: '50%', // Set the width of the modal
+            height: '50%', // Set the height of the modal
+            margin: 'auto', // Center the modal horizontally
+          },
+        }}>
+          <h2>Create Course</h2>
           <input
             type="text"
             placeholder="Enter course name"
             value={newCourseName}
             onChange={(e) => setNewCourseName(e.target.value)}
           />
-          <button onClick={handleCancelCreateCourse}>Cancel</button>
-          <button onClick={handleConfirmCreateCourse}>Confirm</button>
-        </div>
+          <button onClick={() => setShowCreateCoursePopup(false)}>Cancel</button>
+          <button onClick={handleConfirmCreateCourse}>Create</button>
+        </Modal>
       )}
 
       {/* Popup for uploading a new note */}
