@@ -76,4 +76,50 @@
     margin: 0;
     width: 100%;
 }
+
+
+.viewExamButton {
+    display: inline-block;
+    margin-left: 40px;
+    margin-top: 5px;
+    padding: 8px 16px;
+    background-color: #008CBA;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #008CBA;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.viewExamButton:hover {
+    background-color: #036080;
+  }
+
+.aiFeatureModules {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+    margin: 1px;
+    text-align: left;
+    cursor: pointer; 
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.aiFeatureModules:hover {
+    background-color: #a8a8a8;
+}
+
+.aiFeatureModules::after {
+    content: '-';
+    position: absolute;
+    right: 20px;
+}
   
+  .aiFeatureModules.collapsed::after {
+    content: '+';
+  }

@@ -41,6 +41,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [summary, setSummary] = useState([]);
   const [links, setLinks] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [activeSection, setActiveSection] = useState([]);
   const [sourcesHighlight, setSourcesHighlight] = useState([])
   const onCloseModal = () => {
     setModalIsOpen(false);
@@ -181,28 +182,65 @@ const SkuleSparkBody = ({fileStructure}) => {
     }
   };
 
+  const featureDropDown = () => {
+    
+    const toggleSection = (sectionName) => {
+      setActiveSection((prevSections) =>
+        prevSections.includes(sectionName)
+          ? prevSections.filter((name) => name !== sectionName)
+          : [...prevSections, sectionName]
+      );
+    };
+    
+    const isSectionActive = (sectionName) => activeSection.includes(sectionName);
+
+    const renderModule = (sectionName, content) => (
+      <div key={sectionName} style={{ marginBottom: '5px', marginTop: '5px' }}>
+        <button onClick={() => toggleSection(sectionName)} className={`aiFeatureModules ${isSectionActive(sectionName) ? '' : 'collapsed'}`}>{sectionName}</button>
+        {isSectionActive(sectionName) && <div>{content}</div>}
+      </div>
+    );
+
+    return (
+      <div>
+      {renderModule('Chat', displayChat())}
+      {renderModule('Note Summary', displaySummary())}
+      {renderModule('Relevant Links', displayLinks())}
+      {renderModule('Relevant Videos', displayVideos())}
+      {renderModule('Recommended Exam Questions', displayQuiz())}
+      </div>
+    );
+  };
+
   const displayQuiz = () => {
     if (examData && Object.keys(examData).length > 0) {
       return (
         <div>
-          <div>
-            <h2>Recommended Exam Questions</h2>
-          </div>
+          {/* <div>
+            <h2>Try These Questions</h2>
+          </div> */}
           
           {Object.keys(examData).map((examId) => (
             <div key={examId} style={{ marginBottom: '20px' }}>
-              <strong>Skule URL:</strong>
-              <br />
-              <a href={examData[examId].exam_url} target="_blank" rel="noopener noreferrer">
-                {examData[examId].exam_url}
-              </a>
-              <br />
-              <strong style={{ marginTop: '10px', display: 'block' }}>Exam Questions:</strong>
-              <ul style={{ marginLeft: '20px', listStyleType: 'disc' }}>
-                {examData[examId].exam_questions.map((question, index) => (
-                  <li key={index} style={{ marginBottom: '30px' }} className="quizList"><MarkdownRenderer content={question} /></li>
-                ))}
-              </ul>
+            <h3 style={{ marginLeft: '40px', marginTop: '10px', display: 'block' }}>Recommended Exam:</h3>
+            <a
+              href={examData[examId].exam_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className='viewExamButton'
+            >
+              View Original Exam
+          </a>
+
+            <ul style={{ margin: '1px', listStyleType: 'disc' }}>
+              {examData[examId].exam_questions.map((question, index) => (
+                <li key={index} style={{ marginBottom: '30px' }} className="quizList">
+                  <h3 style={{ borderBottom: '1px solid black', paddingBottom: '5px' }}>Extracted Question {index + 1}:</h3>
+                  <div dangerouslySetInnerHTML={{ __html: question }} />
+                </li>
+              ))}
+            </ul>
+
             </div>
           ))}
         </div>
@@ -233,7 +271,8 @@ const SkuleSparkBody = ({fileStructure}) => {
     if (!chatReady) {
       return <div></div>;
     }
-    return( <Chatbot fileId = {fileId} updateHighlight = {updateSourcesHighlight} updatePDFLink={updatePdfURL} PDFLink={pdfURL}/>)
+
+    return( <Chatbot fileId = {fileId} courseCode={selectedCourse} updateHighlight = {updateSourcesHighlight} updatePDFLink={updatePdfURL} PDFLink={pdfURL}/>)
   };
 
   const displaySummary = () => {
@@ -467,11 +506,12 @@ const SkuleSparkBody = ({fileStructure}) => {
       </div>
       <div className="column column3">
         {/*{displayAugmentedNotes()}*/}
-        {displayChat()}
+        {/* {displayChat()}
         {displaySummary()}
         {displayLinks()}
         {displayVideos()}
-        {displayQuiz()}
+        {displayQuiz()} */}
+        {featureDropDown()}
       </div>
 
       {/* Popup for creating a new course */}

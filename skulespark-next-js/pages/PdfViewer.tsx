@@ -16,7 +16,7 @@ function PdfViewer({ pdfLink, highlight}) {
   const [numPages, setNumPages] = useState();
   const [containerRef, setContainerRef] = useState(null);
   const [containerWidth, setContainerWidth] = useState();
-
+  const [scrolled, setScrolled] = useState(false);
   const onResize = useCallback<ResizeObserverCallback>((entries) => {
     const [entry] = entries;
 
@@ -36,16 +36,19 @@ function PdfViewer({ pdfLink, highlight}) {
   function onRenderSuccess(pageIndex) {
     //for each map in highlight
     //if pageIndex == map[page_number]-1
-    var scrolled = false;
+    //var scrolled = false;
     highlight.forEach(element_info => {
       console.log(element_info);
       const highlightIndex =  element_info["page_number"] - 1; // Assuming map is an object with page numbers as keys
       if (pageIndex === highlightIndex) {
         const canvas = canvasRefs.current[pageIndex];
-        canvas.scrollIntoView();
+        if (!scrolled) {
+          canvas.scrollIntoView();
+          setScrolled(true);
+        }
         var context = canvas.getContext("2d");
         var { width, height } = canvas;
-        var actualW = 1700;
+        var actualW = element_info["width"];
         var scaleFactor = width/actualW 
         console.log(width, height);
         context.save();
@@ -89,7 +92,7 @@ function PdfViewer({ pdfLink, highlight}) {
         context.restore();
       }
     });
-
+    setScrolled(false)
   }
 
   // This effect will trigger whenever the documentUrl changes
