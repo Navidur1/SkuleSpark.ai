@@ -534,12 +534,13 @@ const SkuleSparkBody = ({fileStructure}) => {
         style={{
           overlay: {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
           },
           content: {
             width: '50%', // Set the width of the modal
             height: '50%', // Set the height of the modal
             margin: 'auto', // Center the modal horizontally
-          },
+          }, 
         }}>
         <h2>Upload Note</h2>
         <input type="file" onChange={handleFileChange} accept=".pdf" />
