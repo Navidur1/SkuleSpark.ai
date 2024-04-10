@@ -73,7 +73,7 @@ function OCRViewer({ pdfLink, highlight, pageNumber, actualW}) {
     setKey(prevKey => prevKey + 1);
   }, [highlight]);
   return (
-    <div style={{ width: "100%", height: "auto" }}>
+    <div style={{ width: "100%", maxHeight: "700px", overflowY: "auto" }}>
     <Document key= {key} file={pdfLink}>
     <Page
         pageNumber={pageNumber}

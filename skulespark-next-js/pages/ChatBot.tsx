@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
 
-const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink}) => {
+const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink, note}) => {
 
     const [userInput, setUserInput] = useState('');
     const [messages, setMessages] = useState([]);
@@ -107,6 +107,12 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink})
         
         updateHighlight(source["elements"]);
     }
+    // This effect will trigger whenever the documentUrl changes
+    useEffect(() => {
+        // Update key to force re-render of Document component when documentUrl changes
+        setMessages([]);
+        setUserInput("");
+    }, [note]);
     return (
         <div style={{marginBottom: '20px'}}>
             <h2>Chat:</h2>
@@ -143,7 +149,10 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink})
             </div>
 
             {/* Your chatbot UI using messages state */}
-            {messages.map((message, index) => (
+            {messages.map((message, index) => {
+                let prevFilename = null; // Variable to store the previous filenam
+                return(
+                
                 <div style={{display: "flex", justifyContent: index % 2 === 0 ? 'right' : 'left'}}>
                     <div key={index} style={{
                         margin: '10px 0', // Adjust the value (10px) as needed for top and bottom margin
@@ -158,17 +167,29 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink})
                         )}
                         {isSourcesCollapsed[index] && index % 2 !== 0 && (
                             <>
-                                <h3>Sources: </h3>
-                                {message[1].map((source, sourceIndex) => (
+                            <h3>Sources: </h3>
+                            {message[1].map((source, sourceIndex) => {
+                                // Check if the current filename is different from the previous one
+                                const showFilename = sourceIndex === 0 || source["filename"] !== prevFilename;
+                                prevFilename = source["filename"]; // Update prevFilename
+                                
+                                return (
+                                    <>
+                                    {showFilename && <h4>{"From: "+source["filename"]}</h4>}
                                     <div key={sourceIndex} className='sources'>
+                                        {/* Conditionally render <h4> */}
+                                        
                                         <p onClick={() => linkToSource(source)}>{source["text"]}</p>
                                     </div>
-                                ))}
-                            </>
+                                    </>
+                                );
+                            })}
+                        </>
+                        
                         )}
                     </div>
                 </div>
-            ))}
+            )})}
 
         </div>
     );

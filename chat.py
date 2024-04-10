@@ -53,9 +53,9 @@ def get_relevant_sources(message, file_id, whole_course, course_code):
         if 'metadata' in match and 'file_id' in match['metadata']:
             file_id = match['metadata']['file_id']
 
-        _, res = get_data_one('Files', {'_id': ObjectId(file_id)}, {'gcs_link': 1})
+        _, res = get_data_one('Files', {'_id': ObjectId(file_id)}, {'gcs_link': 1, "file_name":1})
         gcs_link = res['gcs_link']
-
+        file_name = res['file_name']
         text = chunk['text']
 
         if (match['score'] < 0.77):
@@ -80,8 +80,8 @@ def get_relevant_sources(message, file_id, whole_course, course_code):
                 }
                 elements.append(element_info)
         
-        context.append({"text": text, "elements":elements, "gcsLink": gcs_link })
-    
+        context.append({"text": text, "elements":elements, "gcsLink": gcs_link, "filename":file_name })
+        context.sort(key=lambda x: x["filename"])
     return context
 
 def get_augmented_message(message, sources):
