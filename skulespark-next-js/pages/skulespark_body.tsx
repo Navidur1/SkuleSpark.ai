@@ -250,15 +250,6 @@ const SkuleSparkBody = ({fileStructure}) => {
           {Object.keys(examData).map((examId) => (
             <div key={examId} style={{ marginBottom: '20px' }}>
             <h3 style={{ marginLeft: '40px', marginTop: '10px', display: 'block' }}>Recommended Exam:</h3>
-            <a
-              href={examData[examId].exam_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className='viewExamButton'
-            >
-              View Original Exam
-          </a>
-
             <ul style={{ margin: '1px', listStyleType: 'disc' }}>
               {examData[examId].exam_questions.map((question, index) => (
                 <li key={index} style={{ marginBottom: '30px' }} className="quizList">
@@ -267,6 +258,14 @@ const SkuleSparkBody = ({fileStructure}) => {
                 </li>
               ))}
             </ul>
+            <a
+              href={examData[examId].exam_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className='viewExamButton'
+            >
+              View Original Exam
+            </a>
 
             </div>
           ))}
@@ -292,7 +291,6 @@ const SkuleSparkBody = ({fileStructure}) => {
     }
 
   }
-
 
   const displayChat = () => {
     if (!chatReady) {
@@ -357,7 +355,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     };
 
     return (
-      <div>
+      <div style={{marginBottom: '10px'}}>
         <h2>Check out these videos:</h2>
         <ul className="videoList">
           {videos.map((video_id, index) => (
@@ -551,7 +549,7 @@ const SkuleSparkBody = ({fileStructure}) => {
             <CourseList key={courseListKey} onSelectCourse={handleSelectCourse} selectedCourse={selectedCourse} courses={courses} />
             <div>
               <button onClick={handleCreateCourse} className="createCourseButton">
-                + Create Course
+                + Add Course
               </button>
             </div>
           </div>
@@ -611,11 +609,11 @@ const SkuleSparkBody = ({fileStructure}) => {
           },
           content: {
             width: '50%', // Set the width of the modal
-            height: '50%', // Set the height of the modal
+            height: '25%', // Set the height of the modal
             margin: 'auto', // Center the modal horizontally
           },
         }}>
-          <h2>Create Course</h2>
+          <h2 style={{textAlign: 'center'}}>Add Course</h2>
           <input
             type="text"
             placeholder="Enter course name"
