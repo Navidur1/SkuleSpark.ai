@@ -168,3 +168,11 @@
 .selected-item {
     background-color: lightgray;
 }
+
+.sources {
+    cursor: pointer;
+}
+
+.sources:hover {
+    background-color: lightgray;
+}
