@@ -4,6 +4,7 @@ from database import insert_one, get_data_one, update_one, pc_get_many, pc_inser
 from bson.objectid import ObjectId
 from collections import Counter
 from flask import Blueprint, request, json, jsonify
+import time
 
 quiz_service = Blueprint('quiz_service', __name__)
 
@@ -25,9 +26,15 @@ def generate_quiz(file_id, course):
     # get # of embeddings
     _, result = get_data_one("Files", {'_id': ObjectId(file_id)}, projection={'chunk_ids': 1})
     top_k = len(result['chunk_ids'])
-
     # retrieve all embeddings for this file
-    _, result = pc_get_many_filter(message_embedding = vector_embedding, top_k = top_k, filter = {"file_id": file_id}, include_values=True)
+    result = []
+    while True:
+        _, result = pc_get_many_filter(message_embedding = vector_embedding, top_k = top_k, filter = {"file_id": file_id}, include_values=True)
+        print("Trying to get embeddings: ", len(result['matches']))
+        if len(result['matches']) >= top_k:
+            break
+        time.sleep(5)
+
     note_embeddings = []
     for match in result['matches']:
         note_embeddings.append(match['values'])
@@ -36,7 +43,6 @@ def generate_quiz(file_id, course):
     question_count = {}
     for embedding in note_embeddings:
         _, result = pc_get_many_filter(embedding, top_k=10, filter={'course': course})
-
         for match in result['matches']:
             if match['score'] < 0.77:
                 pass
