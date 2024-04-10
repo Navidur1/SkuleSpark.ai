@@ -66,6 +66,9 @@ def get_all_links(search_terms, max_wikipedia):
             found_wikipedia = False
             for link_data in links:
                 link = link_data["link"]
+                if 'youtube' in link:
+                    continue
+                
                 if 'wikipedia' in link:
                     if wiki_count < max_wikipedia:
                         all_links.append(link_data)
