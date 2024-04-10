@@ -127,9 +127,9 @@ def process_pdf_files(directory, course):
                     file_storage = FileStorage(file)
                     _, ocr_results = ocr_flow(file_storage, None, skule_scrape=True)
                     exam_text = ""
-                    for elem in ocr_results:
-                        exam_text += elem['text']
-                    
+                    for page in ocr_results:
+                            for elem in page:
+                                exam_text += elem['text']
                     try:
                         result = add_in_markdown(exam_text)
 

@@ -76,10 +76,10 @@ def create_embeddings():
         if not success:
             return "Error"
     
+    success, error_message = update_one('Users', {'name': "Dummy", 'courses.course': course_code}, {'$push': {'courses.$.notes': {'_id': ObjectId(file_id), 'file_name': file_name, 'gcs_link': gcs_link}}})
+
     # generate quiz
     generate_quiz(file_id, course_code)
-
-    success, error_message = update_one('Users', {'name': "Dummy", 'courses.course': course_code}, {'$push': {'courses.$.notes': {'_id': ObjectId(file_id), 'file_name': file_name, 'gcs_link': gcs_link}}})
 
     if not success:
         return error_message, 400
