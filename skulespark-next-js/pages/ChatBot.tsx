@@ -108,7 +108,7 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink})
         updateHighlight(source["elements"]);
     }
     return (
-        <div>
+        <div style={{marginBottom: '20px'}}>
             <h2>Chat:</h2>
             <input
                 type="text"

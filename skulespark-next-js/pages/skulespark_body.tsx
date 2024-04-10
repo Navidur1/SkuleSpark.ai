@@ -308,7 +308,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     }
 
     return(
-      <div>
+      <div style={{marginBottom: '20px'}}>
         <h2>Note Summary:</h2>
         {summary}
       </div>
