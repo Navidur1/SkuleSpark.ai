@@ -30,6 +30,7 @@ function PdfViewer({ pdfLink, highlight}) {
 
   function onDocumentLoadSuccess({ numPages }){
     setNumPages(numPages);
+    setScrolled(false)
   }
   
   
@@ -92,7 +93,6 @@ function PdfViewer({ pdfLink, highlight}) {
         context.restore();
       }
     });
-    setScrolled(false)
   }
 
   // This effect will trigger whenever the documentUrl changes

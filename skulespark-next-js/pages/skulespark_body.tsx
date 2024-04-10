@@ -306,7 +306,7 @@ const SkuleSparkBody = ({fileStructure}) => {
       return <div></div>;
     }
 
-    return( <Chatbot fileId = {fileId} courseCode={selectedCourse} updateHighlight = {updateSourcesHighlight} updatePDFLink={updatePdfURL} PDFLink={pdfURL}/>)
+    return( <Chatbot fileId = {fileId} courseCode={selectedCourse} note= {selectedNote} updateHighlight = {updateSourcesHighlight} updatePDFLink={updatePdfURL} PDFLink={pdfURL}/>)
   };
 
   const displaySummary = () => {
@@ -437,10 +437,11 @@ const SkuleSparkBody = ({fileStructure}) => {
     {
       return (
         <>
+        <h2 style={{textAlign: "center", marginTop:"0px"}}>OCR Results</h2>
         <div style={{ display: 'flex', justifyContent: 'space-between'}}>
           <div style={{ flex: '1', marginRight: '20px' }}> 
-            <h2>OCR Results:</h2>
-            <div style={{ overflowY: 'auto', maxHeight: "80%",width:"100%"}}>
+          <h3 style = {{textAlign: "center"}}>Edit OCR</h3>
+            <div style={{ overflowY: 'auto', maxHeight: "700px",width:"100%"}}>
             {/* {confirmedResults[pageNumber-1].map((result, index) => (
               <div style={{border: '1px solid', padding: "5px 5px"}}
                 key={index}
@@ -471,7 +472,8 @@ const SkuleSparkBody = ({fileStructure}) => {
               fontSize: 'large'
               }} onClick={handleOCRConfirm}>Confirm OCR Results</button>
           </div>
-          <div style={{width:"50%"}}>
+          <div style={{height:"700px", width:"50%"}}>
+          <h3 style = {{textAlign: "center"}}>Original PDF</h3>
             <OCRViewer pdfLink={pdfURL} highlight = {coordOCR} pageNumber = {pageNumber} actualW={OCRW} /> 
             <div style={{ 
               display: 'flex',
@@ -662,24 +664,8 @@ const SkuleSparkBody = ({fileStructure}) => {
             zIndex: 999,
           },
           content: {
-<<<<<<< HEAD
-            width: '50%', // Set the width of the modal
-            height: '25%', // Set the height of the modal
-            margin: 'auto', // Center the modal horizontally
-          },
-        }}>
-          <h2 style={{textAlign: 'center'}}>Add Course</h2>
-          <input
-            type="text"
-            placeholder="Enter course name"
-            value={newCourseName}
-            onChange={(e) => setNewCourseName(e.target.value)}
-          />
-          <button onClick={() => setShowCreateCoursePopup(false)}>Cancel</button>
-          <button onClick={handleConfirmCreateCourse}>Create</button>
-=======
             width: '50%',
-            height: '25%',
+            height: '40%',
             margin: 'auto',
             display: 'flex',
             flexDirection: 'column',
@@ -769,7 +755,6 @@ const SkuleSparkBody = ({fileStructure}) => {
               fontSize: 'large'
             }}>Create</button>
           </div>
->>>>>>> 8059b71 (modal css changes and spinner)
         </Modal>
       )}
 
