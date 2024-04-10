@@ -26,10 +26,10 @@ def get_gpt_response(note_content):
     augmented_message = get_augmented_message(note_content)
     messages = [{
                     "role": "system", 
-                    "content": """For a given paragraph, return a summary and a list of keywords that best represents the paragraph.
+                    "content": """For a given note, return a summary and a list of 5 keywords that best represents the note.
                             Return in JSON format:
                             \`\`\`json
-                            { "summary": "Summary of the paragraph", "keywords": ["KEYWORD1", "KEYWORD2"] }
+                            { "summary": "Summary of the note", "keywords": ["KEYWORD1", "KEYWORD2"] }
                             \`\`\``"""
                 },
                 {

@@ -18,7 +18,7 @@ except ConfigurationError:
 
 # Connect with pinecone
 try:
-    pinecone.init(api_key="dfcae6b3-b49d-4a28-916c-59ed61c7172a", environment='northamerica-northeast1-gcp')  # Replace with your Pinecone API key
+    pinecone.init(api_key="dfcae6b3-b49d-4a28-916c-59ed61c7172a", environment='gcp-starter')  # Replace with your Pinecone API key
     index_name = "skulespark"
     pindex = pinecone.Index(index_name)
     print(pinecone.list_indexes(), pindex.describe_index_stats())
