@@ -11,6 +11,10 @@ import PdfViewer from '../pages/PdfViewer.tsx';
 import YouTube from 'react-youtube';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
 import OCRViewer from '../pages/OCRViewer.tsx';
+import Backdrop from '@mui/material/Backdrop';
+import StarIcon from '@mui/icons-material/Star';
+import CircularProgress from '@mui/material/CircularProgress';
+
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
 }
@@ -48,6 +52,8 @@ const SkuleSparkBody = ({fileStructure}) => {
   const [confirmedResults, setConfirmedResults] = useState([]);
   const [coordOCR, setCoordOCR] = useState([]);
   const [OCRW, setOCRW] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   const onCloseModal = () => {
     setModalIsOpen(false);
   };
@@ -125,7 +131,8 @@ const SkuleSparkBody = ({fileStructure}) => {
         window.alert('Please select a note type');
         return; // Should indicate some sort of alert to the user
       }
-      
+
+      setLoading(true);
       const formData = new FormData();
       formData.append('pdf', pdfFile);
       formData.append('note_type', noteType);
@@ -166,7 +173,9 @@ const SkuleSparkBody = ({fileStructure}) => {
       //iterate over data results and store in confirmedResults
       const results = data.ocr_result.map(page => page.map(element => ({"id": element["id"], "text": element["text"]})));
       setConfirmedResults(results);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error('Error uploading PDF:', error);
     }
   };
@@ -448,14 +457,56 @@ const SkuleSparkBody = ({fileStructure}) => {
               </div>
             ))}
             </div>
-            <button style={{backgroundColor: "green", marginTop:"5px"}} onClick={handleOCRConfirm}>Confirm OCR Results</button>
+            <button style={{
+              marginTop: '10px',
+              width: '100%',
+              height: '40px',
+              marginRight: '20px',
+              background: 'green',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              color: 'white',
+              transition: 'background-color 0.3s ease',
+              fontWeight: 'bold',
+              fontSize: 'large'
+              }} onClick={handleOCRConfirm}>Confirm OCR Results</button>
           </div>
           <div style={{width:"50%"}}>
             <OCRViewer pdfLink={pdfURL} highlight = {coordOCR} pageNumber = {pageNumber} actualW={OCRW} /> 
-            <div style={{ marginTop: '5px' }}>
-              <button onClick={handlePreviousPage}>Previous</button>
+            <div style={{ 
+              display: 'flex',
+              flex: '1',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: '5px'
+              }}>
+              <button onClick={handlePreviousPage} style={{
+                width: '200px',
+                height: '40px',
+                marginRight: '20px',
+                background: 'white',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                color: 'blue',
+                borderColor: '#112a9a',
+                transition: 'background-color 0.3s ease',
+                fontWeight: 'bold',
+                fontSize: 'large'
+              }}>Previous</button>
               <span style={{ margin: '0 10px' }}>{pageNumber}</span> {/* Display current page number */}
-              <button onClick={handleNextPage}>Next</button>
+              <button onClick={handleNextPage} style={{
+                width: '200px',
+                height: '40px',
+                marginLeft: '20px',
+                background: 'blue',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                color: 'white',
+                borderColor: '#112a9a',
+                transition: 'background-color 0.3s ease',
+                fontWeight: 'bold',
+                fontSize: 'large'}}
+                >Next</button>
             </div>
           </div>
         </div>
@@ -494,6 +545,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     // Send confirmation to embedding service
     try{
       //updateCurrentPage(pageNumber);
+      setLoading(true);
       console.log("CONFIRMED", confirmedResults);
       const response = await fetch('http://127.0.0.1:5000/confirm_results', {
         method: 'POST',
@@ -506,6 +558,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         // Request was successful
         const data = await response.json();
 
+        setLoading(false);
         setSummary(data.summary);
         setLinks(data.links);
         setVideos(data.videos);
@@ -519,6 +572,7 @@ const SkuleSparkBody = ({fileStructure}) => {
       }
     }
     catch (error) {
+      setLoading(false);
       console.error('Error during OCR:', error);
     }
   };
@@ -601,13 +655,14 @@ const SkuleSparkBody = ({fileStructure}) => {
 
       {/* Modal for creating a new course */}
       {showCreateCoursePopup && (
-        <Modal isOpen={true} onRequestClose={() => setShowCreateCoursePopup(false)}
+        <Modal isOpen={true} onRequestClose={() => {}} backdrop="static"
         style={{
           overlay: {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             zIndex: 999,
           },
           content: {
+<<<<<<< HEAD
             width: '50%', // Set the width of the modal
             height: '25%', // Set the height of the modal
             margin: 'auto', // Center the modal horizontally
@@ -622,12 +677,105 @@ const SkuleSparkBody = ({fileStructure}) => {
           />
           <button onClick={() => setShowCreateCoursePopup(false)}>Cancel</button>
           <button onClick={handleConfirmCreateCourse}>Create</button>
+=======
+            width: '50%',
+            height: '25%',
+            margin: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+          },
+        }}>
+          <h2>Create Course</h2>
+          <div style={{marginBottom: '1rem', display: 'flex', justifyContent: 'center'}}>
+            <div style=
+              {{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+              }}>
+                <input
+                  type="text"
+                  placeholder="Course Name (Ex: ECE568)"
+                  value={newCourseName}
+                  onChange={(e) => setNewCourseName(e.target.value)}
+                  style={{
+                    width: '100%',
+                    height: '40px',
+                    margin: 'auto',
+                    fontSize: 'medium',
+                    flex: '1',
+                    borderRadius: '20px',
+                  }}
+                />
+                {newCourseName && (
+                <button
+                  onClick={() => setNewCourseName('')}
+                  style={{
+                    cursor: 'pointer',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                  }}
+                  >X</button>
+              )}
+            </div>
+          </div>
+          <div>
+            <h3>Current List of Courses with Available Skule Exams</h3>
+            <ul style={{ listStyleType: 'none', padding: 0 }}>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px' }} />
+                    <span style={{ color: 'black' }}>ECE568</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>JRE420</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>CHANGE ME</span>
+                </li>
+            </ul>
+          </div>
+          <div style={{display: 'flex',justifyContent: 'right'}}>
+            <button onClick={() => setShowCreateCoursePopup(false)} onMouseEnter={(e) => e.target.style.backgroundColor = 'lightgray'} onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+            style=
+            {{
+              width: '100px',
+              height: '40px',
+              marginRight: '20px',
+              background: 'white',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              color: 'blue',
+              borderColor: '#112a9a',
+              transition: 'background-color 0.3s ease',
+              fontWeight: 'bold',
+              fontSize: 'large'
+            }}>Cancel</button>
+            <button onClick={handleConfirmCreateCourse} onMouseEnter={(e) => e.target.style.backgroundColor = '#112a9a'} onMouseLeave={(e) => e.target.style.backgroundColor = 'blue'}
+            style=
+            {{
+              width: '200px',
+              height: '40px',
+              marginRight: '20px',
+              background: 'blue',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              color: 'white',
+              borderColor: '#112a9a',
+              transition: 'background-color 0.3s ease',
+              fontWeight: 'bold',
+              fontSize: 'large'
+            }}>Create</button>
+          </div>
+>>>>>>> 8059b71 (modal css changes and spinner)
         </Modal>
       )}
 
       {/* Popup for uploading a new note */}
       {showUploadNotePopup && selectedCourse != null && (
-        <Modal isOpen={modalIsOpen} onRequestClose={onCloseModal}
+        <Modal isOpen={modalIsOpen} onRequestClose={() => {}} backdrop="static"
         style={{
           overlay: {
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -639,6 +787,9 @@ const SkuleSparkBody = ({fileStructure}) => {
             margin: 'auto', // Center the modal horizontally
           }, 
         }}>
+          <Backdrop open={loading} style={{ zIndex: 1000 }}>
+                <CircularProgress sx={{ color: 'white' }} />
+          </Backdrop>
           {!hideOCROptions && (
         <div>
           <h2>Upload Note</h2>
@@ -670,9 +821,36 @@ const SkuleSparkBody = ({fileStructure}) => {
               onChange={handleNoteTypeChange}
             />
             <label htmlFor="both">Typed + Handwritten</label>
-          </div>
-          <button onClick={handleUpload}>Upload</button>
-          <button onClick={handleCancelUploadNote}>Cancel</button>
+            </div>
+          <button onClick={handleCancelUploadNote}
+          style={{
+            width: '100px',
+            height: '40px',
+            marginRight: '20px',
+            background: 'white',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            color: 'blue',
+            borderColor: '#112a9a',
+            transition: 'background-color 0.3s ease',
+            fontWeight: 'bold',
+            fontSize: 'large'
+          }}>Cancel</button>
+          <button onClick={handleUpload}
+          style={{
+            width: '200px',
+              height: '40px',
+              marginRight: '20px',
+              background: 'blue',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              color: 'white',
+              borderColor: '#112a9a',
+              transition: 'background-color 0.3s ease',
+              fontWeight: 'bold',
+              fontSize: 'large'
+          }}
+          >Upload</button>
         </div> )}
         {displayOCRResult()}
         </Modal>
