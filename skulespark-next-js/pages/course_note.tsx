@@ -24,7 +24,7 @@ export interface Note {
 const CourseNotes: React.FC<CourseNotesProps> = ({ selectedCourse, onSelectNote, fileStructure, selectedNote }) => {
   return (
     <div className="courseListWrapper">
-      <h2>Notes for {selectedCourse ? selectedCourse.course : 'No course selected'}</h2>
+      <h2>{selectedCourse ? 'Notes for ' + selectedCourse.course : 'No course selected'}</h2>
       <ul className="courseList">
         {selectedCourse &&
           fileStructure

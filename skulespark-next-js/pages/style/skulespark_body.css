@@ -13,9 +13,10 @@
 }
   
 .column1 {
-    width: 2%;
+    width: 50px;
     height: 100%;
     background-color: #F3F2F1;
+    padding-top: 5px;
 }
   
 .column2 {
@@ -125,9 +126,6 @@
     content: '+';
   }
 
-.link_master_wrapper{
-    padding: 10px;
-}
 .link_wrapper{
     display: flex;
     align-items: center;
@@ -168,5 +166,13 @@
 }
 
 .selected-item {
+    background-color: lightgray;
+}
+
+.sources {
+    cursor: pointer;
+}
+
+.sources:hover {
     background-color: lightgray;
 }

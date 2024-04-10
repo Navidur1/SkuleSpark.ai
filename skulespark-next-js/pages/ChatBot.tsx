@@ -160,7 +160,7 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink})
                             <>
                                 <h3>Sources: </h3>
                                 {message[1].map((source, sourceIndex) => (
-                                    <div key={sourceIndex}>
+                                    <div key={sourceIndex} className='sources'>
                                         <p onClick={() => linkToSource(source)}>{source["text"]}</p>
                                     </div>
                                 ))}
