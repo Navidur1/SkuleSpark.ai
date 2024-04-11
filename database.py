@@ -2,6 +2,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.errors import *
 import pinecone
 import certifi
+import time
 
 
 # Connect to MongoDB
@@ -125,10 +126,11 @@ def pc_get_many_filter(message_embedding, filter=None, top_k=5, include_values =
         return (False, e)
 
 def pc_insert_one(data):
-    try:
-        pindex.upsert(data)
-        return True
+    while(True):
+        try:
+            pindex.upsert(data)
+            return True
 
-    except Exception as e:
-        print("Error inserting to pinecone:", str(e))
-        return False
+        except Exception as e:
+            print("Error inserting to pinecone:", str(e))
+            time.sleep(1)
