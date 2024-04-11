@@ -694,16 +694,24 @@ const SkuleSparkBody = ({fileStructure}) => {
             <h3>Current List of Courses with Available Skule Exams</h3>
             <ul style={{ listStyleType: 'none', padding: 0 }}>
                 <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>ECE311</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>ECE344</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>ECE361</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
                     <StarIcon style={{marginRight: '5px' }} />
                     <span style={{ color: 'black' }}>ECE568</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center' }}>
                     <StarIcon style={{marginRight: '5px'}} />
                     <span style={{ color: 'black' }}>JRE420</span>
-                </li>
-                <li style={{ display: 'flex', alignItems: 'center' }}>
-                    <StarIcon style={{marginRight: '5px'}} />
-                    <span style={{ color: 'black' }}>CHANGE ME</span>
                 </li>
             </ul>
           </div>
