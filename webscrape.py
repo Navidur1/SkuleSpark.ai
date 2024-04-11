@@ -5,8 +5,8 @@ from urllib.parse import urlparse
 import time
 
 #Skulespark@gmail.com key
-API_KEY = "AIzaSyAPvQ4rM3utD22oHlY7a8kuhtlQ6bBtTPc"
-CX = "378336830fc104cdf"
+API_KEY = "AIzaSyDvD6gGkgkCzE0Xz28v3AqMaO83DH4oVIQ"
+CX = "e5a61e98c0e0a48e9"
 NUM_RESULTS = 3
 
 def extract_base_url(url):
