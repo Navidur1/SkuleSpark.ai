@@ -420,10 +420,10 @@ const SkuleSparkBody = ({fileStructure}) => {
     {
       return (
         <>
-        <h2 style={{textAlign: "center", marginTop:"0px"}}>OCR Results</h2>
+        <h2 style={{textAlign: "center", marginTop: "0px", marginBottom: "0px"}}>OCR Results</h2>
         <div style={{ display: 'flex', justifyContent: 'space-between'}}>
           <div style={{ flex: '1', marginRight: '20px' }}> 
-          <h3 style = {{textAlign: "center"}}>Edit OCR</h3>
+          <h3 style = {{textAlign: "center", marginTop: '8px'}}>Edit OCR</h3>
             <div style={{ overflowY: 'auto', maxHeight: "700px",width:"100%"}}>
             {/* {confirmedResults[pageNumber-1].map((result, index) => (
               <div style={{border: '1px solid', padding: "5px 5px"}}
@@ -456,7 +456,7 @@ const SkuleSparkBody = ({fileStructure}) => {
               }} onClick={handleOCRConfirm}>Confirm OCR Results</button>
           </div>
           <div style={{height:"700px", width:"50%"}}>
-          <h3 style = {{textAlign: "center"}}>Original PDF</h3>
+          <h3 style = {{textAlign: "center", marginTop: '8px'}}>Original PDF</h3>
             <OCRViewer pdfLink={pdfURL} highlight = {coordOCR} pageNumber = {pageNumber} actualW={OCRW} /> 
             <div style={{ 
               display: 'flex',
@@ -694,16 +694,24 @@ const SkuleSparkBody = ({fileStructure}) => {
             <h3>Current List of Courses with Available Skule Exams</h3>
             <ul style={{ listStyleType: 'none', padding: 0 }}>
                 <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>ECE311</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>ECE344</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
+                    <StarIcon style={{marginRight: '5px'}} />
+                    <span style={{ color: 'black' }}>ECE361</span>
+                </li>
+                <li style={{ display: 'flex', alignItems: 'center' }}>
                     <StarIcon style={{marginRight: '5px' }} />
                     <span style={{ color: 'black' }}>ECE568</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center' }}>
                     <StarIcon style={{marginRight: '5px'}} />
                     <span style={{ color: 'black' }}>JRE420</span>
-                </li>
-                <li style={{ display: 'flex', alignItems: 'center' }}>
-                    <StarIcon style={{marginRight: '5px'}} />
-                    <span style={{ color: 'black' }}>CHANGE ME</span>
                 </li>
             </ul>
           </div>
