@@ -14,6 +14,8 @@ import OCRViewer from '../pages/OCRViewer.tsx';
 import Backdrop from '@mui/material/Backdrop';
 import StarIcon from '@mui/icons-material/Star';
 import CircularProgress from '@mui/material/CircularProgress';
+import { port } from '../pages/globalVars';
+
 
 interface SkuleSparkBodyProps{
   fileStructure: Course[];
@@ -71,7 +73,7 @@ const SkuleSparkBody = ({fileStructure}) => {
     setShowUploadedNote(false);
     const fetchNoteData = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:5000/note_data/${note._id.$oid}`, {
+        const response = await fetch(`http://127.0.0.1:${port}/note_data/${note._id.$oid}`, {
           method: 'GET',
         });
 
@@ -139,7 +141,7 @@ const SkuleSparkBody = ({fileStructure}) => {
       console.log(selectedCourse?.course)
       formData.append('course', selectedCourse?.course);
 
-      const response = await fetch('http://127.0.0.1:5000/upload', {
+      const response = await fetch(`http://127.0.0.1:${port}/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -188,7 +190,7 @@ const SkuleSparkBody = ({fileStructure}) => {
 
   const handleConfirmCreateCourse = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/course', {
+      const response = await fetch(`http://127.0.0.1:${port}/course`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -286,7 +288,7 @@ const SkuleSparkBody = ({fileStructure}) => {
   const getQuiz = async (note: Note) => {
 
     try{
-      const response = await fetch(`http://127.0.0.1:5000/get-quiz/${note?._id.$oid}`, {
+      const response = await fetch(`http://127.0.0.1:${port}/get-quiz/${note?._id.$oid}`, {
         method: 'GET',
       });
 
@@ -528,7 +530,7 @@ const SkuleSparkBody = ({fileStructure}) => {
 
   const getAugmentedNotes = async () =>{
     try{
-      const response = await fetch(`http://127.0.0.1:5000/augmented-note/${fileId}`, {
+      const response = await fetch(`http://127.0.0.1:${port}/augmented-note/${fileId}`, {
         method: 'GET',
       });
       if (response.ok) {
@@ -549,7 +551,7 @@ const SkuleSparkBody = ({fileStructure}) => {
       //updateCurrentPage(pageNumber);
       setLoading(true);
       console.log("CONFIRMED", confirmedResults);
-      const response = await fetch('http://127.0.0.1:5000/confirm_results', {
+      const response = await fetch(`http://127.0.0.1:${port}/confirm_results`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Set the content type to JSON

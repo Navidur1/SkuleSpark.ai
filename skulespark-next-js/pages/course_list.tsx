@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Note } from './course_note';
 import './style/courseList.css';
+import { port } from '../pages/globalVars';
 
 interface CourseListProps {
   onSelectCourse: (course: Course) => void;
@@ -13,7 +14,7 @@ export interface Course {
 
 export const fetchCourses = async (): Promise<Course[]> => {
   try {
-    const response = await fetch('http://127.0.0.1:5000/file_structure/69420', {
+    const response = await fetch(`http://127.0.0.1:${port}/file_structure/69420`, {
       method: 'GET',
     });
 

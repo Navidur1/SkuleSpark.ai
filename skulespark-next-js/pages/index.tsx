@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import SkuleSparkHeader from './skulespark_header';
 import SkuleSparkBody from './skulespark_body';
+import { port } from '../pages/globalVars';
+
 
 const App = () => {
 
@@ -10,7 +12,7 @@ const App = () => {
     const fetchFileStructure = async () => {
       try {
         //TODO: change this to actual user id in the future
-        const response = await fetch('http://127.0.0.1:5000/file_structure/69420', {
+        const response = await fetch(`http://127.0.0.1:${port}/file_structure/69420`, {
           method: 'GET',
         });
 
