@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownRenderer from '../pages/MarkdownRenderer';
+import { port } from '../pages/globalVars';
 
 const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink, note}) => {
 
@@ -25,7 +26,7 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink, 
             const history = messages.slice(-4).map(([msg]) => msg);
             //console.log("HISTORY", messages)
             //const history = messages.length >= 5 ? messages.slice(-4).map(([msg]) => msg) : messages.slice(0).map(([msg]) => msg);
-            const response = await fetch('http://127.0.0.1:5000/chat-prompt', {
+            const response = await fetch(`http://127.0.0.1:${port}/chat-prompt`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
