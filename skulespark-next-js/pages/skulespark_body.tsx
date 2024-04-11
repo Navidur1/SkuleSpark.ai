@@ -83,8 +83,7 @@ const SkuleSparkBody = ({fileStructure}) => {
           setSummary(data.summary);
           setLinks(data.links);
           setVideos(data.videos);
-          console.log("ajkhsdksa");
-          console.log(data);
+          setExamData(data.questions);
           setChatReady(data.chat_ready);
         } else {
           console.error('Failed to fetch note data');
@@ -98,7 +97,6 @@ const SkuleSparkBody = ({fileStructure}) => {
     setSourcesHighlight([])
     setSelectedNote(note);
     setPdfURL(note.gcs_link);
-    getQuiz(note);
     setFileId(note._id.$oid)
   };
   const updatePdfURL = newValue => {
@@ -285,23 +283,6 @@ const SkuleSparkBody = ({fileStructure}) => {
     }
   };
 
-  const getQuiz = async (note: Note) => {
-
-    try{
-      const response = await fetch(`http://127.0.0.1:${port}/get-quiz/${note?._id.$oid}`, {
-        method: 'GET',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setExamData(data)
-      }
-    }
-    catch (error) {
-      console.error('Error during fetching augmented notes:', error);
-    }
-
-  }
 
   const displayChat = () => {
     if (!chatReady) {
@@ -566,6 +547,7 @@ const SkuleSparkBody = ({fileStructure}) => {
         setSummary(data.summary);
         setLinks(data.links);
         setVideos(data.videos);
+        setExamData(data.questions);
         setChatReady(true);
         getAugmentedNotes();
         setShowUploadNotePopup(false);

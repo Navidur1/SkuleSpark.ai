@@ -10,7 +10,6 @@
     padding-left: 5px;
     padding-right: 5px;
     border: 1px solid black;
-    text-align: center;
 }
   
 .column1 {
@@ -44,6 +43,7 @@
 
 .noteColumn{
     width: 200px;
+    text-align: center;
 }
 
 .sidebarButton{

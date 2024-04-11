@@ -5,7 +5,7 @@ from async_service import create_summary, get_all_links, get_all_videos
 from bson.objectid import ObjectId
 import os
 from dotenv import load_dotenv, find_dotenv
-from quiz_service import generate_quiz
+from quiz_service import generate_quiz, get_quiz
 embedding_service = Blueprint('embedding_service', __name__)
 
 # Set up open ai 
@@ -78,13 +78,15 @@ def create_embeddings():
     
     success, error_message = update_one('Users', {'name': "Dummy", 'courses.course': course_code}, {'$push': {'courses.$.notes': {'_id': ObjectId(file_id), 'file_name': file_name, 'gcs_link': gcs_link}}})
 
+    if not success:
+        return error_message, 400
+    
     # generate quiz
     generate_quiz(file_id, course_code)
 
-    if not success:
-        return error_message, 400
+    questions = get_quiz(file_id)
 
-    return jsonify({'summary': summary_dict['summary'], 'links': links, 'videos': videos}), 200
+    return jsonify({'summary': summary_dict['summary'], 'links': links, 'videos': videos, 'questions': questions}), 200
 
 def chunk_elements(elements, file_id):
     chunks = []
