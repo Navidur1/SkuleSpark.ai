@@ -14,12 +14,15 @@ def get_video(keyword):
         q=keyword,
         type="video"
     )
-
-    response = request.execute()
+    try:
+        response = request.execute()
+    except Exception as e:
+        print("[YOUTUBE] Request failed for term: " + keyword)
 
     ids = []
 
-    for item in response['items']:
-        ids.append(item['id']['videoId'])
+    if response is not None:
+        for item in response['items']:
+            ids.append(item['id']['videoId'])
 
     return ids
