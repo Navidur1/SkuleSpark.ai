@@ -61,7 +61,7 @@ def get_relevant_sources(message, file_id, whole_course, course_code):
             pass 
 
         elements = []  # List to store elements for the current chunk
-        print(text)
+
         for element_id in chunk['element_ids']:
             success, element_data = get_data_one('Elements', {'_id': ObjectId(element_id)})
             if success:
@@ -75,7 +75,6 @@ def get_relevant_sources(message, file_id, whole_course, course_code):
         
         context.append({"text": text, "elements":elements, "gcsLink": gcs_link, "filename":file_name })
         context.sort(key=lambda x: x["filename"])
-    print(context)
     return context
 
 def get_augmented_message(message, sources):
