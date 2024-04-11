@@ -609,7 +609,7 @@ const SkuleSparkBody = ({fileStructure}) => {
               </button>
             </div>
           </div>
-          <div className={`column ${showAdditionalColumns ? 'small' : ''}`}>
+          <div className={`column ${showAdditionalColumns ? 'small' : ''} noteColumn`}>
             <CourseNotes key={noteListKey} selectedCourse={selectedCourse} onSelectNote={handleSelectNote} fileStructure={courses} selectedNote={selectedNote}/>
             <div>
               {selectedCourse != null && (
