@@ -4,7 +4,6 @@ from bson.objectid import ObjectId
 from openai import OpenAI
 import json
 import os
-import tiktoken
 from dotenv import load_dotenv,find_dotenv
 from database import pc_get_many, get_data_one, pc_get_many_filter
 import time
@@ -18,14 +17,14 @@ client = OpenAI(
 
 model_id = 'gpt-3.5-turbo'
 embedding_model = "text-embedding-ada-002"
-encoding = tiktoken.encoding_for_model(model_id)
+# encoding = tiktoken.encoding_for_model(model_id)
 
 chat_service = Blueprint('chat_service', __name__)
 
-def num_tokens_from_string(string: str):
-    """Returns the number of tokens in a text string."""
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
+# def num_tokens_from_string(string: str):
+#     """Returns the number of tokens in a text string."""
+#     num_tokens = len(encoding.encode(string))
+#     return num_tokens
 
 
 def get_relevant_sources(message, file_id, whole_course, course_code):
@@ -61,12 +60,6 @@ def get_relevant_sources(message, file_id, whole_course, course_code):
         if (match['score'] < 0.77):
             pass 
 
-        tokens += num_tokens_from_string(text)
-        if tokens > MAX_TOKENS:
-            break
-
-        
-        
         elements = []  # List to store elements for the current chunk
 
         for element_id in chunk['element_ids']:
