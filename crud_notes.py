@@ -75,7 +75,7 @@ def get_file_structure(user_id):
 
 @crud_notes.route('/note_data/<note_id>', methods=['GET'])
 def get_note_data(note_id):
-    success, note_data = get_data_one('Files', {'_id': ObjectId(note_id)}, {'summary': 1, 'links': 1, 'videos': 1, 'chat_ready': 1})
+    success, note_data = get_data_one('Files', {'_id': ObjectId(note_id)}, {'summary': 1, 'links': 1, 'videos': 1, 'chat_ready': 1, 'questions': 1})
 
     if not success:
         return "Could not fetch note data", 400
