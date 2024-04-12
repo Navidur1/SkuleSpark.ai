@@ -40,7 +40,7 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink, 
 
                 // TODO: Add an empty message to the messages array
                 // Messages is an array where each message is a ["text", "references"] array
-                setMessages(prevMessages => [...prevMessages, ["", [""]]]);
+                setMessages(prevMessages => [...prevMessages, ["", [{}]]]);
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -148,7 +148,7 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink, 
 
                 {/* <p>Selected Chat Type: {chatType}</p> Display the selected value */}
             </div>
-
+            <div style={{maxHeight:"500px", overflowY:"auto"}}>
             {/* Your chatbot UI using messages state */}
             {messages.map((message, index) => {
                 let prevFilename = null; // Variable to store the previous filenam
@@ -191,6 +191,7 @@ const Chatbot = ({ fileId, courseCode, updateHighlight, updatePDFLink, PDFLink, 
                     </div>
                 </div>
             )})}
+            </div>
 
         </div>
     );
