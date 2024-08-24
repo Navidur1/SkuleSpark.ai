@@ -76,7 +76,7 @@ def ocr_flow(uploaded_file, file_id, skule_scrape = False, note_type = "typed"):
 
     headers = {
         "accept": "application/json",
-        "unstructured-api-key": "Sm6Y1c1fb34p2QeAqQmSSMtNRgqxFx",
+        "unstructured-api-key": "unstructured_key",
     }
     data = {}
     print(note_type)
