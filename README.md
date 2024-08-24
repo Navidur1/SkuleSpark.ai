@@ -1,4 +1,7 @@
 # SkuleSpark.ai
+![image](https://github.com/user-attachments/assets/18d731b1-6e7e-4196-8420-b121c68970b1)
+
+
 ![Poster](https://github.com/user-attachments/assets/b653271e-77ab-4410-8fea-8be1c5cfaa44)
 
 System Design:
